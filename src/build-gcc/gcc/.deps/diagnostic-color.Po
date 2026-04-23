@@ -1,0 +1,24 @@
+diagnostic-color.o: ../../gcc-13.2.0/gcc/diagnostic-color.cc config.h \
+ auto-host.h ../../gcc-13.2.0/gcc/../include/ansidecl.h \
+ ../../gcc-13.2.0/gcc/system.h \
+ ../../gcc-13.2.0/gcc/../include/safe-ctype.h \
+ ../../gcc-13.2.0/gcc/../include/filenames.h \
+ ../../gcc-13.2.0/gcc/../include/hashtab.h \
+ ../../gcc-13.2.0/gcc/../include/ansidecl.h \
+ ../../gcc-13.2.0/gcc/../include/libiberty.h ../../gcc-13.2.0/gcc/hwint.h \
+ ../../gcc-13.2.0/gcc/diagnostic-color.h \
+ ../../gcc-13.2.0/gcc/diagnostic-url.h \
+ ../../gcc-13.2.0/gcc/color-macros.h
+config.h:
+auto-host.h:
+../../gcc-13.2.0/gcc/../include/ansidecl.h:
+../../gcc-13.2.0/gcc/system.h:
+../../gcc-13.2.0/gcc/../include/safe-ctype.h:
+../../gcc-13.2.0/gcc/../include/filenames.h:
+../../gcc-13.2.0/gcc/../include/hashtab.h:
+../../gcc-13.2.0/gcc/../include/ansidecl.h:
+../../gcc-13.2.0/gcc/../include/libiberty.h:
+../../gcc-13.2.0/gcc/hwint.h:
+../../gcc-13.2.0/gcc/diagnostic-color.h:
+../../gcc-13.2.0/gcc/diagnostic-url.h:
+../../gcc-13.2.0/gcc/color-macros.h:

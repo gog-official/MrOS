@@ -1,0 +1,31 @@
+charset.o: ../../../gcc-13.2.0/libcpp/charset.cc config.h \
+ ../../../gcc-13.2.0/libcpp/system.h \
+ ../../../gcc-13.2.0/libcpp/../include/filenames.h \
+ ../../../gcc-13.2.0/libcpp/../include/hashtab.h \
+ ../../../gcc-13.2.0/libcpp/../include/ansidecl.h \
+ ../../../gcc-13.2.0/libcpp/../include/libiberty.h \
+ ../../../gcc-13.2.0/libcpp/../include/safe-ctype.h \
+ ../../../gcc-13.2.0/libcpp/include/cpplib.h \
+ ../../../gcc-13.2.0/libcpp/include/symtab.h \
+ ../../../gcc-13.2.0/libcpp/../include/obstack.h \
+ ../../../gcc-13.2.0/libcpp/include/line-map.h \
+ ../../../gcc-13.2.0/libcpp/internal.h \
+ ../../../gcc-13.2.0/libcpp/include/symtab.h \
+ ../../../gcc-13.2.0/libcpp/ucnid.h ../../../gcc-13.2.0/libcpp/uname2c.h \
+ ../../../gcc-13.2.0/libcpp/generated_cpp_wcwidth.h
+config.h:
+../../../gcc-13.2.0/libcpp/system.h:
+../../../gcc-13.2.0/libcpp/../include/filenames.h:
+../../../gcc-13.2.0/libcpp/../include/hashtab.h:
+../../../gcc-13.2.0/libcpp/../include/ansidecl.h:
+../../../gcc-13.2.0/libcpp/../include/libiberty.h:
+../../../gcc-13.2.0/libcpp/../include/safe-ctype.h:
+../../../gcc-13.2.0/libcpp/include/cpplib.h:
+../../../gcc-13.2.0/libcpp/include/symtab.h:
+../../../gcc-13.2.0/libcpp/../include/obstack.h:
+../../../gcc-13.2.0/libcpp/include/line-map.h:
+../../../gcc-13.2.0/libcpp/internal.h:
+../../../gcc-13.2.0/libcpp/include/symtab.h:
+../../../gcc-13.2.0/libcpp/ucnid.h:
+../../../gcc-13.2.0/libcpp/uname2c.h:
+../../../gcc-13.2.0/libcpp/generated_cpp_wcwidth.h:

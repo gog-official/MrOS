@@ -1,0 +1,26 @@
+traditional.o: ../../../gcc-13.2.0/libcpp/traditional.cc config.h \
+ ../../../gcc-13.2.0/libcpp/system.h \
+ ../../../gcc-13.2.0/libcpp/../include/filenames.h \
+ ../../../gcc-13.2.0/libcpp/../include/hashtab.h \
+ ../../../gcc-13.2.0/libcpp/../include/ansidecl.h \
+ ../../../gcc-13.2.0/libcpp/../include/libiberty.h \
+ ../../../gcc-13.2.0/libcpp/../include/safe-ctype.h \
+ ../../../gcc-13.2.0/libcpp/include/cpplib.h \
+ ../../../gcc-13.2.0/libcpp/include/symtab.h \
+ ../../../gcc-13.2.0/libcpp/../include/obstack.h \
+ ../../../gcc-13.2.0/libcpp/include/line-map.h \
+ ../../../gcc-13.2.0/libcpp/internal.h \
+ ../../../gcc-13.2.0/libcpp/include/symtab.h
+config.h:
+../../../gcc-13.2.0/libcpp/system.h:
+../../../gcc-13.2.0/libcpp/../include/filenames.h:
+../../../gcc-13.2.0/libcpp/../include/hashtab.h:
+../../../gcc-13.2.0/libcpp/../include/ansidecl.h:
+../../../gcc-13.2.0/libcpp/../include/libiberty.h:
+../../../gcc-13.2.0/libcpp/../include/safe-ctype.h:
+../../../gcc-13.2.0/libcpp/include/cpplib.h:
+../../../gcc-13.2.0/libcpp/include/symtab.h:
+../../../gcc-13.2.0/libcpp/../include/obstack.h:
+../../../gcc-13.2.0/libcpp/include/line-map.h:
+../../../gcc-13.2.0/libcpp/internal.h:
+../../../gcc-13.2.0/libcpp/include/symtab.h:

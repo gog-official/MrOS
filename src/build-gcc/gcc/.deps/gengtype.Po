@@ -1,0 +1,32 @@
+gengtype.o: ../../gcc-13.2.0/gcc/gengtype.cc config.h auto-host.h \
+ ../../gcc-13.2.0/gcc/../include/ansidecl.h ../../gcc-13.2.0/gcc/system.h \
+ ../../gcc-13.2.0/gcc/../include/safe-ctype.h \
+ ../../gcc-13.2.0/gcc/../include/filenames.h \
+ ../../gcc-13.2.0/gcc/../include/hashtab.h \
+ ../../gcc-13.2.0/gcc/../include/ansidecl.h \
+ ../../gcc-13.2.0/gcc/../include/libiberty.h ../../gcc-13.2.0/gcc/hwint.h \
+ ../../gcc-13.2.0/gcc/errors.h ../../gcc-13.2.0/gcc/../include/getopt.h \
+ version.h ../../gcc-13.2.0/gcc/../include/xregex.h \
+ ../../gcc-13.2.0/gcc/../include/xregex2.h \
+ ../../gcc-13.2.0/gcc/../include/obstack.h \
+ ../../gcc-13.2.0/gcc/gengtype.h ../../gcc-13.2.0/gcc/rtl.def \
+ ../../gcc-13.2.0/gcc/insn-notes.def
+config.h:
+auto-host.h:
+../../gcc-13.2.0/gcc/../include/ansidecl.h:
+../../gcc-13.2.0/gcc/system.h:
+../../gcc-13.2.0/gcc/../include/safe-ctype.h:
+../../gcc-13.2.0/gcc/../include/filenames.h:
+../../gcc-13.2.0/gcc/../include/hashtab.h:
+../../gcc-13.2.0/gcc/../include/ansidecl.h:
+../../gcc-13.2.0/gcc/../include/libiberty.h:
+../../gcc-13.2.0/gcc/hwint.h:
+../../gcc-13.2.0/gcc/errors.h:
+../../gcc-13.2.0/gcc/../include/getopt.h:
+version.h:
+../../gcc-13.2.0/gcc/../include/xregex.h:
+../../gcc-13.2.0/gcc/../include/xregex2.h:
+../../gcc-13.2.0/gcc/../include/obstack.h:
+../../gcc-13.2.0/gcc/gengtype.h:
+../../gcc-13.2.0/gcc/rtl.def:
+../../gcc-13.2.0/gcc/insn-notes.def:
