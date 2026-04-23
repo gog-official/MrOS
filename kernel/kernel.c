@@ -1,25 +1,20 @@
 // kernel/kernel.c
 
-#define VGA_ADDRESS 0xB8000
-#define VGA_COLS 80
-#define VGA_ROWS 25
-#define VGA_COLOR(bg, fg) ((bg << 4) | fg)
-#define COLOR_DEFAULT	VGA_COLOR(0, 15)
-#define COLOR_GREEN	VGA_COLOR(0, 10)
-#define COLOR_RED	VGA_COLOR(0, 12)
-#define COLOR_CYAN	VGA_COLOR(0, 11)
-#define COLOR_YEELLOW	VGA_COLOR(0, 14)
+#include "vga.h"
+#include "idt.h"
+#include "pic.h"
+#include "timer.h"
+#include "fitness.h"
 
-static volatile unsigned short* const vga = (unsigned short*)VGA_ADDRESS;
+static volatile unsigned short* const vga_buf = (unsigned short*)VGA_ADDRESS;
 
-static int cursor_row;
-static int cursor_col;
+int cursor_col = 0;
+int cursor_row = 0;
 
 // write char colours to screen position
 
-static void vga_set_cell(int row, int col, char c, unsigned char color) {
-    int index = row * VGA_COLS + col;
-    vga[index] = (unsigned short)((color << 8) | (unsigned char)c);
+static void vga_set_cell(int row, int col, char c, uint8_t color) {
+	vga_buf[row * VGA_COLS + col] = (unsigned short)((color << 8) | (unsigned char)c);
 }
 
 // fill entire screen with spaces
@@ -38,7 +33,7 @@ static void vga_scroll(void) {
 	// move up
 	for (int row = 0; row < VGA_ROWS -1; row++) {
 		for (int col = 0; col < VGA_COLS; col++) {
-			vga[row * VGA_COLS + col] = vga[(row + 1) * VGA_COLS + col];
+			vga_buf[row * VGA_COLS + col] = vga_buf[(row + 1) * VGA_COLS + col];
 		}
 	}
 
@@ -51,8 +46,24 @@ static void vga_scroll(void) {
 	cursor_row = VGA_ROWS -1;
 }
 
+void vga_set_cursor(int row, int col) {
+	cursor_row = row;
+	cursor_col = col;
+}
+
+void vga_print_at(int row, int col, const char* str, uint8_t color) {
+	int c = col;
+	for (int i = 0; str[i] && c < VGA_COLS; i++, c++)
+		vga_set_cell(row, c, str[i], color);
+}
+
+void vga_clear_row(int row) {
+	for (int c = 0; c < VGA_COLS; c++)
+		vga_set_cell(row, c, ' ', COLOR_DEFAULT);
+}
+
 // print one char, \n and scrolling too
-void vga_putchar(char c, unsigned char color) {
+void vga_putchar(char c, uint8_t color) {
 	if (c == '\n') {
 		cursor_col = 0;
 		cursor_row++;
@@ -79,14 +90,14 @@ void vga_putchar(char c, unsigned char color) {
 
 // print nul terminated string
 
-void vga_print(const char* str, unsigned char color) {
+void vga_print(const char* str, uint8_t color) {
 	for (int i = 0; str[i] != 0; i++) {
 		vga_putchar(str[i], color);
 	}
 }
 
 // print string then newline
-void vga_println(const char* str, unsigned char color) {
+void vga_println(const char* str, uint8_t color) {
 	vga_print(str, color);
 	vga_putchar('\n', color);
 }
@@ -134,11 +145,8 @@ void vga_print_int(int value, unsigned char color) {
 }
 
 //print hex with 0x prefix
-void vga_print_hex(unsigned int value, unsigned char color) {
-	char buf[16];
-	vga_print("0x", color);
-	itoa((int)value, buf, 16);
-	vga_print(buf, color);
+void vga_print_hex(uint32_t v, uint8_t color) {
+    char buf[16]; vga_print("0x", color); itoa((int)v, buf, 16); vga_print(buf, color);
 }
 
 // after all screen setup, finally kmain
@@ -151,11 +159,14 @@ void kmain(void) {
     );
 
     	vga_clear();
+	idt_init();
+	pic_remap();
+	timer_init();
 	
 	// Banner for OS
 	vga_println("==============================================", COLOR_CYAN);
-	vga_println("             MrOS - Keeps you fit             ", COLOR_YEELLOW);
-	vga_println("    Now with water timer, workout and infos   ", COLOR_YEELLOW);
+	vga_println("             MrOS - Keeps you fit             ", COLOR_YELLOW);
+	vga_println("    Now with water timer, workout and infos   ", COLOR_YELLOW);
 	vga_println("==============================================", COLOR_CYAN);
 	vga_putchar('\n', COLOR_DEFAULT);
 
@@ -170,22 +181,11 @@ void kmain(void) {
 	vga_println("VGA text driver initialized (80x25)", COLOR_DEFAULT);
 	
 	vga_putchar('\n', COLOR_DEFAULT);
+	
+	// fitness
+	run_fitness_sequence();
 
-	// showing how great my itoa is
-	vga_print("Kernel loaded at address: ", COLOR_CYAN);
-	vga_print_hex(0x10000, COLOR_YEELLOW);
-	vga_putchar('\n', COLOR_DEFAULT);
-
-	vga_print("VGA buffer address: ", COLOR_CYAN);
-	vga_print_hex(0xB8000, COLOR_YEELLOW);
-	vga_putchar('\n', COLOR_DEFAULT);
-
-	vga_print("Test integer (1337): ", COLOR_CYAN);
-	vga_print_int(1337, COLOR_YEELLOW);
-	vga_putchar('\n', COLOR_DEFAULT);
-
-	vga_putchar('\n', COLOR_DEFAULT);
-	vga_println("kernel is alive. Halting GPU.", COLOR_GREEN);
+	vga_println("\nLOOK AT YOUR BODY, then think about cheating in next stage", COLOR_YELLOW);
 
 	// halting
 	for (;;) {

@@ -7,13 +7,20 @@ QEMU = qemu-system-i386
 OBJCOPY = i686-elf-objcopy
 
 CFLAGS = -m32 -ffreestanding -fno-builtin -fno-stack-protector \
-	 -nostdlib -Wall -Wextra -O2 -fno-merge-constants -fno-jump-tables -fno-pic
+	 -nostdlib -Wall -Wextra -O2 -Ikernel -fno-merge-constants -fno-jump-tables -fno-pic
 LDFLAGS = -m elf_i386 -nostdlib -T linker.ld
 
 # O files
 BOOT_BIN = boot/boot.bin
 ENTRY_OBJ = kernel/kernel_entry.o
-KERNEL_OBJ = kernel/kernel.o
+
+C_OBJS = \
+	 kernel/kernel.o \
+	 kernel/idt.o \
+	 kernel/pic.o \
+	 kernel/timer.o \
+	 kernel/fitness.o
+
 KERNEL_BIN = kernel/kernel.bin
 OS_IMAGE = mros.img
 
@@ -26,11 +33,11 @@ $(BOOT_BIN): boot/boot_sect.asm
 $(ENTRY_OBJ): kernel/kernel_entry.asm
 	$(NASM) -f elf32 $< -o $@
 
-$(KERNEL_OBJ): kernel/kernel.c
+kernel/%.o: kernel/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(KERNEL_BIN): $(ENTRY_OBJ) $(KERNEL_OBJ)
-	$(LD) $(LDFLAGS) -o kernel/kernel.elf $(ENTRY_OBJ) $(KERNEL_OBJ)
+$(KERNEL_BIN): $(ENTRY_OBJ) $(C_OBJS)
+	$(LD) $(LDFLAGS) -o kernel/kernel.elf $(ENTRY_OBJ) $(C_OBJS)
 	$(OBJCOPY) -O binary kernel/kernel.elf $@
 
 $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN)
@@ -45,6 +52,6 @@ run-gui: $(OS_IMAGE)
 	$(QEMU) -drive format=raw,file=$(OS_IMAGE)
 
 clean:
-	rm -f $(BOOT_BIN) $(ENTRY_OBJ) $(KERNEL_OBJ) $(KERNEL_BIN) kernel/kernel.elf $(OS_IMAGE)
+	rm -f $(BOOT_BIN) $(ENTRY_OBJ) $(C_OBJS) $(KERNEL_BIN) kernel/kernel.elf $(OS_IMAGE)
 
 .PHONY: all run run-gui clean
