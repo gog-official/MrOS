@@ -1,0 +1,75 @@
+# =========================
+# Build outputs
+# =========================
+*.o
+*.obj
+*.elf
+*.bin
+*.iso
+*.img
+
+# Keep your source linker script, but ignore generated variants if any
+*.map
+
+# =========================
+# QEMU / emulator logs
+# =========================
+qemu*.log
+*.log
+
+# =========================
+# Disk images (VERY IMPORTANT)
+# =========================
+mros.img
+
+# =========================
+# Build directories
+# =========================
+build/
+out/
+bin/
+target/
+src/
+
+# =========================
+# Toolchain noise
+# =========================
+*.d
+*.dep
+*.tmp
+
+# =========================
+# WakaTime / editor metadata
+# =========================
+.wakatime-project
+
+# =========================
+# OS / editor junk
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Vim / Neovim
+# =========================
+*.swp
+*.swo
+*.swn
+
+# =========================
+# GCC / linker temp artifacts
+# =========================
+*.stackdump
+*.exe
+
+# =========================
+# Debug / emulator state
+# =========================
+*.vdi
+*.vmdk
+*.qcow2
+
+# =========================
+# NASM / assembler outputs (if any temporary files appear)
+# =========================
+*.lst

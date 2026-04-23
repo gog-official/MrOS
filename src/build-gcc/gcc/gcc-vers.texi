@@ -1,5 +1,0 @@
-@set version-GCC 13.2.0
-@clear DEVELOPMENT
-@set srcdir /home/guruorgoru/Projects/mros/src/build-gcc/gcc/../../gcc-13.2.0/gcc
-@set VERSION_PACKAGE (GCC) 
-@set BUGURL @uref{https://gcc.gnu.org/bugs/}
