@@ -98,17 +98,17 @@ void run_single_excercise(const exercise_t* ex) {
 	vga_clear_row(bar_row);
 	vga_print_at(count_row, 0, " DONE!", COLOR_GREEN);
 
-	if (ex->rest > 0) {
-		int rest_row = count_row + 2;
+    if (ex->rest > 0) {
+        int rest_row = count_row + 2;
 
-		vga_set_cursor(rest_row, 0);
-		for (int remaining = ex->rest; remaining >=0; remaining++) {
-			draw_rest(rest_row, remaining);
-			if (remaining > 0) timer_sleep(1);
-		}
-		vga_clear_row(rest_row);
-		vga_print_at(rest_row, 0, "  Rest Completed.", COLOR_GREY);
-	}
+        vga_set_cursor(rest_row, 0);
+        for (int remaining = ex->rest; remaining >= 0; remaining--) {
+            draw_rest(rest_row, remaining);
+            if (remaining > 0) timer_sleep(1);
+        }
+        vga_clear_row(rest_row);
+        vga_print_at(rest_row, 0, "  Rest Completed.", COLOR_GREY);
+    }
 	vga_putchar('\n', COLOR_DEFAULT);
 }
 

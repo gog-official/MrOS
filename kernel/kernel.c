@@ -155,14 +155,17 @@ void kmain(void) {
 		"movw $0x3C2, %%dx\n"
 		"movb $0x63, %%al\n"
 	        "outb %%al, %%dx\n"
-        	::: "eax", "edx"
-    );
+         	::: "eax", "edx"
+    	);
 
     	vga_clear();
 	idt_init();
 	pic_remap();
 	timer_init();
 	
+	// Enable interrupts
+	__asm__ volatile ("sti");
+
 	// Banner for OS
 	vga_println("==============================================", COLOR_CYAN);
 	vga_println("             MrOS - Keeps you fit             ", COLOR_YELLOW);
@@ -181,6 +184,12 @@ void kmain(void) {
 	vga_println("VGA text driver initialized (80x25)", COLOR_DEFAULT);
 	
 	vga_putchar('\n', COLOR_DEFAULT);
+	
+	// Wait 5 seconds so user can read the boot messages
+	timer_sleep(5);
+	
+	// Clear screen before workout
+	vga_clear();
 	
 	// fitness
 	run_fitness_sequence();
