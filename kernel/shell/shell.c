@@ -240,7 +240,10 @@ void shell_run(void) {
 	char* argv[SHELL_ARGS_MAX];
 	int argc;
 
-	vga_println("Type 'help' for available commands.", COLOR_GREY);
+	vga_println("****************************************************", COLOR_YELLOW);
+	vga_println("     Welcome to MrOs, aware of water reminders??    ", COLOR_CYAN);
+	vga_println("            Type 'help' for commands ;)             ", COLOR_GREY);
+	vga_println("****************************************************", COLOR_YELLOW);
 	vga_putchar('\n', COLOR_DEFAULT);
 
 	while (1) {

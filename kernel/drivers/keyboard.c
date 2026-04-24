@@ -197,6 +197,7 @@ void keyboard_readline(char* buf, int max) {
 		if (pos >= max - 1) continue;
 
 		buf[pos++] = c;
+		vga_set_cursor(cursor_row, cursor_col);
 		vga_putchar(c, COLOR_DEFAULT);
 	}
 }

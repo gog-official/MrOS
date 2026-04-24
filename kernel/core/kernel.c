@@ -50,11 +50,24 @@ static void vga_scroll(void) {
 
 	// kep cursor at last
 	cursor_row = VGA_ROWS -1;
+	cursor_col = 0;
+	vga_update_cursor(cursor_row, cursor_col);
 }
 
 void vga_set_cursor(int row, int col) {
 	cursor_row = row;
 	cursor_col = col;
+	vga_update_cursor(row, col);
+}
+
+void vga_update_cursor(int row, int col) {
+	uint16_t pos = row *VGA_COLS + col;
+
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, (uint8_t)(pos & 0xFF));
+
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
 }
 
 void vga_print_at(int row, int col, const char* str, uint8_t color) {
@@ -92,6 +105,7 @@ void vga_putchar(char c, uint8_t color) {
 	if (cursor_row >= VGA_ROWS) {
 		vga_scroll();
 	}
+	vga_update_cursor(cursor_row, cursor_col);
 }
 
 // print nul terminated string
@@ -199,13 +213,12 @@ void kmain(void) {
 	vga_clear();
 	
 	// fitness
-	// run_fitness_sequence();
+//	run_fitness_sequence();
 	
 
 	timer_sleep(3);
 	vga_clear();
 
-	vga_println("Hello, Liked your pump, welcome to MROS!", COLOR_CYAN);
 	shell_run();
 	// halting
 	for (;;) {
