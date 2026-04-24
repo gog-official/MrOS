@@ -119,10 +119,12 @@ static void cmd_reboot(int argc, char** argv) {
 }
 
 //workout, lezgoo
+static int workouts_completed = 0;
 static void cmd_workout(int argc, char**argv) {
 	(void)argc; (void)argv;
 	vga_clear();
 	run_fitness_sequence();
+	workouts_completed++;
 	vga_clear();
 }
 
@@ -150,11 +152,11 @@ static void cmd_exercise(int argc, char** argv) {
 	
 	vga_clear();
 	run_single_excercise(&ex);
+	workouts_completed++;
 	vga_clear();
 }
 
 // stats
-static int workouts_completed = 0;
 static void cmd_stats(int argc, char** argv) {
 	(void)argc; (void)argv;
 
@@ -177,6 +179,101 @@ static void cmd_stats(int argc, char** argv) {
 	vga_println("", COLOR_DEFAULT);
 }
 
+// helpers for general info commands
+int k_atoi(char *s) {
+	int result = 0;
+	int i = 0;
+
+	while (s[i] >= '0' && s[i] <= '9') {
+		result = result * 10 + (s[i] - '0');
+		i++;
+	}
+	return result;
+}
+
+// general info commands
+static void cmd_protein(int argc, char **argv) {
+	if (argc < 3) {
+		vga_println("Usage: protein <weight> <activity factor: low, mid, high>", COLOR_YELLOW);
+		vga_println("  eg: protein 69 high ", COLOR_GREY);
+		return;
+	}
+	int weight = k_atoi(argv[1]);
+	int multiplier;
+
+	if (k_strcmp(argv[2], "low") == 0) {
+		multiplier = 80;
+	} else if (k_strcmp(argv[2], "mid") == 0) {
+		multiplier = 150;
+	} else if (k_strcmp(argv[2], "high") == 0) {
+		multiplier = 200;
+	} else {
+		multiplier = 120;
+	}
+	
+	int protein_req = weight * multiplier;
+	
+	vga_print("Your protein requirement per day: ", COLOR_DEFAULT);
+	vga_print_int(protein_req / 100, COLOR_GREY);
+	vga_print(".", COLOR_GREY);
+	vga_print_int(protein_req % 100, COLOR_GREY);
+
+	vga_println(" g", COLOR_GREY);
+
+}
+
+static void cmd_fat(int argc, char **argv) {
+	if (argc < 2) {
+		vga_println("Usage: fat <weight>", COLOR_YELLOW);
+		vga_println("  eg: fat 69", COLOR_GREY);
+		return;
+	}
+	int weight = k_atoi(argv[1]);
+	int fat_req = 80 * weight;
+	vga_print("Your fat requirement per day: ", COLOR_DEFAULT);
+	vga_print_int(fat_req / 100, COLOR_GREY);
+	vga_print(".", COLOR_GREY);
+	vga_print_int(fat_req % 100, COLOR_GREY);
+	vga_println(" g", COLOR_GREY);
+}
+
+static void cmd_carbs(int argc, char **argv) {
+	if (argc < 4) {
+		vga_println("Usage: carbs <daily calories> <protein(g), no fractions> <fat(g), no fractions>", COLOR_YELLOW);
+		vga_println("  eg: carbs 1800 60 30", COLOR_GREY);
+		return;
+	}
+	int kcal = k_atoi(argv[1]);
+	int protein = k_atoi(argv[2]);
+	int fat = k_atoi(argv[3]);
+
+	int carbs_req = (100 * kcal-(400*protein + 900*fat)) / 4;
+	vga_print("Your carbs requirement per day: ", COLOR_DEFAULT);
+	vga_print_int(carbs_req / 100, COLOR_GREY);
+	vga_print(".", COLOR_GREY);
+	vga_print_int(carbs_req % 100, COLOR_GREY);
+	vga_println(" g", COLOR_GREY);
+	vga_println("Note: carbs aren't your enemy, calories are", COLOR_GREEN);
+}
+
+static void cmd_water(int argc, char **argv) {
+	(void)argc; (void)argv;
+	vga_println("Just drink when you are thirsty, try other commands", COLOR_DEFAULT);
+}
+
+static void cmd_motivation(int argc, char **argv) {
+	(void)argc; (void)argv;
+	vga_println("No excuses. Execute the plan.", COLOR_GREEN);
+	vga_println("30 minutes daily is enough. Consistency wins.", COLOR_GREEN);
+	vga_println("Your body responds to discipline, not motivation.", COLOR_GREEN);
+	vga_println("Eat properly. Train regularly. Sleep correctly.", COLOR_GREEN);
+	vga_println("Small effort today beats regret tomorrow.", COLOR_GREEN);
+	vga_println("YOU NEED TO SURVIVE. SURVIVAL IS KEY.", COLOR_GREEN);
+	vga_println("You have the key now, little workout and diet improvement can add 20 years(more than your age) to your lifespan. No joke Lock in", COLOR_GREEN);
+	vga_println("The motive of this os was to make you realise that even as a tech bro, health is the greatest achievment", COLOR_DEFAULT);
+	vga_println("Need help, this os is with you", COLOR_GREY);
+}
+
 // command table
 typedef struct {
 	const char* name;
@@ -194,8 +291,13 @@ static const command_t commands[] = {
 	{ "reboot", cmd_reboot, "reboots the machine" },
 	//fitness
 	{ "workout", cmd_workout, "run the full workout sequence" },
-	{ "exercise", cmd_exercise, "exercose <name> <secs> - one set" },
+	{ "exercise", cmd_exercise, "exercise <name> <secs> - one set" },
 	{ "stats", cmd_stats, "show session stats" },
+	{ "protein", cmd_protein, "protein <weight> <activity level(high, mid,low)> gives your estimate protein requirement to hit" },
+	{ "fat", cmd_fat, "fat <weight> gives your estimate fat intake for a day" },
+	{ "carbs", cmd_carbs, "carbs <kcal/day> <protein(g)> <fat(g)> gives daily carbohydrate requirement" },
+	{ "water", cmd_water, "how much to drink water" },
+	{ "motivate", cmd_motivation, "get motivation to workout and change your life" }, 
 	//sentinel
 	{ 0, 0, 0 }
 };
