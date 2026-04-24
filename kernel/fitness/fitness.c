@@ -1,7 +1,7 @@
 // 40s for pushups, 10s for rest then 50s for squat, no rests.
 #include "fitness.h"
-#include "vga.h"
-#include "timer.h"
+#include "../core/vga.h"
+#include "../drivers/timer.h"
 
 // the workout
 static const exercise_t workout[] = {
@@ -26,7 +26,7 @@ static int my_itoa(int v, char* buf) {
 // progress bar
 static void draw_progress(int row, int done, int total) {
 	const int W = 40;
-	int filled = (total > 0) ? (done + W / total) : 0;
+	int filled = (total > 0) ? ((done * W) / total) : 0;
 
 	char bar[82];
 	int i = 0;

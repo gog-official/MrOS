@@ -1,28 +1,34 @@
 # MrOS Makefile
-# prereqs : nasm, qemu-full
 CC = i686-elf-gcc
 LD = i686-elf-ld
 NASM = nasm
 QEMU = qemu-system-i386
 OBJCOPY = i686-elf-objcopy
 
-CFLAGS = -m32 -ffreestanding -fno-builtin -fno-stack-protector \
-	 -nostdlib -Wall -Wextra -O2 -Ikernel -fno-merge-constants -fno-jump-tables -fno-pic
+INCLUDES = -Ikernel/core -Ikernel/interrupts -Ikernel/drivers -Ikernel/fitness -Ikernel/shell
+CFLAGS = -D__STDC_HOSTED__=0 -Ikernel/include -m32 -ffreestanding \
+          -fno-builtin -fno-stack-protector -nostdlib \
+          -Wall -Wextra -O2 $(INCLUDES) -Ikernel \
+          -fno-merge-constants -fno-jump-tables -fno-pic
 LDFLAGS = -m elf_i386 -nostdlib -T linker.ld
 
 # O files
 BOOT_BIN = boot/boot.bin
-ENTRY_OBJ = kernel/kernel_entry.o
+ENTRY_OBJ = kernel/core/kernel_entry.o
 
-C_OBJS = \
-	 kernel/kernel.o \
-	 kernel/idt.o \
-	 kernel/pic.o \
-	 kernel/timer.o \
-	 kernel/fitness.o
+
+SRCDIRS = \
+	 kernel/core \
+	 kernel/interrupts \
+	 kernel/shell \
+	 kernel/drivers \
+	 kernel/fitness
 
 KERNEL_BIN = kernel/kernel.bin
 OS_IMAGE = mros.img
+
+C_SRCS := $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c))
+C_OBJS := $(patsubst %.c,%.o,$(C_SRCS))
 
 all: $(OS_IMAGE)
 
@@ -30,10 +36,10 @@ all: $(OS_IMAGE)
 $(BOOT_BIN): boot/boot_sect.asm
 	$(NASM) -f bin $< -o $@
 
-$(ENTRY_OBJ): kernel/kernel_entry.asm
+$(ENTRY_OBJ): kernel/core/kernel_entry.asm
 	$(NASM) -f elf32 $< -o $@
 
-kernel/%.o: kernel/%.c
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(KERNEL_BIN): $(ENTRY_OBJ) $(C_OBJS)

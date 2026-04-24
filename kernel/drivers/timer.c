@@ -1,8 +1,8 @@
 // PIT setup and irq0 handler
 
 #include "timer.h"
-#include "idt.h"
-#include "pic.h"
+#include "../interrupts/idt.h"
+#include "../interrupts/pic.h"
 
 // global tickie counter
 static volatile uint32_t ticks = 0;

@@ -28,6 +28,7 @@ void vga_print_hex(uint32_t value, uint8_t color);
 
 // extra
 void vga_set_cursor(int row, int col);
+void vga_set_cell(int row, int col, char c, uint8_t color);
 void vga_print_at(int row, int col, const char* str, uint8_t color);
 void vga_clear_row(int row);
 

@@ -5,7 +5,7 @@ SECTIONS
     . = 0x10000;
 
     .text : {
-	kernel/kernel_entry.o(.text)
+	kernel/core/kernel_entry.o(.text)
         *(.text)
     }
 

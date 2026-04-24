@@ -1,10 +1,12 @@
 // kernel/kernel.c
 
 #include "vga.h"
-#include "idt.h"
-#include "pic.h"
-#include "timer.h"
-#include "fitness.h"
+#include "../interrupts/idt.h"
+#include "../interrupts/pic.h"
+#include "../drivers/timer.h"
+#include "../fitness/fitness.h"
+#include "../drivers/keyboard.h"
+#include "../shell/shell.h"
 
 static volatile unsigned short* const vga_buf = (unsigned short*)VGA_ADDRESS;
 
@@ -13,7 +15,11 @@ int cursor_row = 0;
 
 // write char colours to screen position
 
-static void vga_set_cell(int row, int col, char c, uint8_t color) {
+void vga_set_cell(int row, int col, char c, uint8_t color) {
+	// Bounds check to prevent crashes
+	if (row < 0 || row >= VGA_ROWS || col < 0 || col >= VGA_COLS) {
+		return;
+	}
 	vga_buf[row * VGA_COLS + col] = (unsigned short)((color << 8) | (unsigned char)c);
 }
 
@@ -162,6 +168,7 @@ void kmain(void) {
 	idt_init();
 	pic_remap();
 	timer_init();
+	keyboard_init();
 	
 	// Enable interrupts
 	__asm__ volatile ("sti");
@@ -182,20 +189,24 @@ void kmain(void) {
 
 	vga_print("[OK] ", COLOR_GREEN);
 	vga_println("VGA text driver initialized (80x25)", COLOR_DEFAULT);
+	vga_println("\nLOOK AT YOUR BODY, then think about cheating in next stage", COLOR_YELLOW);
 	
 	vga_putchar('\n', COLOR_DEFAULT);
 	
 	// Wait 5 seconds so user can read the boot messages
 	timer_sleep(5);
 	
-	// Clear screen before workout
 	vga_clear();
 	
 	// fitness
-	run_fitness_sequence();
+	// run_fitness_sequence();
+	
 
-	vga_println("\nLOOK AT YOUR BODY, then think about cheating in next stage", COLOR_YELLOW);
+	timer_sleep(3);
+	vga_clear();
 
+	vga_println("Hello, Liked your pump, welcome to MROS!", COLOR_CYAN);
+	shell_run();
 	// halting
 	for (;;) {
 		__asm__ volatile ("hlt");
