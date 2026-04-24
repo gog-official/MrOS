@@ -33,7 +33,7 @@ static void k_itoa(int v, char* buf) {
 // command parser
 static void cmd_parse(char* line, char* argv[], int* argc) {
 	*argc = 0;
-	char* p = lune;
+	char* p = line;
 
 	while (*p) {
 		while (*p == ' ') p++;
@@ -121,7 +121,9 @@ static void cmd_reboot(int argc, char** argv) {
 //workout, lezgoo
 static void cmd_workout(int argc, char**argv) {
 	(void)argc; (void)argv;
+	vga_clear();
 	run_fitness_sequence();
+	vga_clear();
 }
 
 //custom workout
@@ -145,8 +147,10 @@ static void cmd_exercise(int argc, char** argv) {
 	ex.name = argv[1];
 	ex.duration = secs;
 	ex.rest = 0;
-
+	
+	vga_clear();
 	run_single_excercise(&ex);
+	vga_clear();
 }
 
 // stats
