@@ -36,25 +36,22 @@ void vga_clear(void) {
 	cursor_col = 0;
 }
 
-// shift every row up by one, blank the last row
 static void vga_scroll(void) {
 	// scroll ceiling is statusbar_divider_row -1 = row 22
 	// row 23-24 never touched ;) by the scroll path
 	//always keep statusbar safe
 	int scroll_limit = STATUSBAR_DIVIDER_ROW - 1;
-	// move up
 	for (int row = 0; row < scroll_limit; row++) {
 		for (int col = 0; col < VGA_COLS; col++) {
 			vga_buf[row * VGA_COLS + col] = vga_buf[(row + 1) * VGA_COLS + col];
 		}
 	}
 
-	// blank the last row
 	for (int col = 0; col < VGA_COLS; col++) {
 		vga_set_cell(scroll_limit, col, ' ', COLOR_DEFAULT);
 	}
 
-	// kep cursor at last row before status bar
+
 	cursor_row = scroll_limit -1;
 	cursor_col = 0;
 	vga_update_cursor(cursor_row, cursor_col);
@@ -87,7 +84,6 @@ void vga_clear_row(int row) {
 		vga_set_cell(row, c, ' ', COLOR_DEFAULT);
 }
 
-// print one char, \n and scrolling too
 void vga_putchar(char c, uint8_t color) {
 	if (c == '\n') {
 		cursor_col = 0;
@@ -101,20 +97,16 @@ void vga_putchar(char c, uint8_t color) {
 		cursor_col++;
 	}
 
-	//wrap at end
 	if (cursor_col >= VGA_COLS) {
 		cursor_col = 0;
 		cursor_row ++;
 	}
 	
-	// scroll if last row exceeded
 	if (cursor_row >= STATUSBAR_DIVIDER_ROW - 1) {
 		vga_scroll();
 	}
 	vga_update_cursor(cursor_row, cursor_col);
 }
-
-// print nul terminated string
 
 void vga_print(const char* str, uint8_t color) {
 	for (int i = 0; str[i] != 0; i++) {
@@ -122,7 +114,6 @@ void vga_print(const char* str, uint8_t color) {
 	}
 }
 
-// print string then newline
 void vga_println(const char* str, uint8_t color) {
 	vga_print(str, color);
 	vga_putchar('\n', color);
@@ -155,7 +146,6 @@ static char* itoa(int value, char* buf, int base) {
 	int j = 0;
 	if (negative) buf[j++] = '-';
 
-	//reverse into o buffer
 	while (i > 0) {
 		buf[j++] = tmp[--i];
 	}
@@ -163,14 +153,12 @@ static char* itoa(int value, char* buf, int base) {
 	return buf;
 }
 
-// print a int directly to screen
 void vga_print_int(int value, unsigned char color) {
 	char buf[32];
 	itoa(value, buf, 10);
 	vga_print(buf, color);
 }
 
-//print hex with 0x prefix
 void vga_print_hex(uint32_t v, uint8_t color) {
     char buf[16]; vga_print("0x", color); itoa((int)v, buf, 16); vga_print(buf, color);
 }
@@ -194,10 +182,9 @@ int k_atoi(char *s) {
 }
 
 // ===============================================
-// KMAIN - XD
+
 // ===============================================
 
-// after all screen setup, finally kmain
 void kmain(void) {
 	__asm__ volatile (
 		"movw $0x3C2, %%dx\n"
@@ -231,14 +218,14 @@ void kmain(void) {
 	// 	Timer must be running (sti done) so timer_get_ticks() is meaningful.
 	reminder_init();
 
-	// Banner for OS
+
 	vga_println("==============================================", COLOR_CYAN);
 	vga_println("             MrOS - Keeps you fit             ", COLOR_YELLOW);
 	vga_println("   Now with water reminder, workout and infos ", COLOR_YELLOW);
 	vga_println("==============================================", COLOR_CYAN);
 	vga_putchar('\n', COLOR_DEFAULT);
 
-	// sysinfo
+
 	vga_print("[OK] ", COLOR_GREEN);
 	vga_println("Bootloader complete, kernel loaded", COLOR_DEFAULT);
 
@@ -257,16 +244,13 @@ void kmain(void) {
 	vga_clear();
 	statusbar_init();
 	
-	// fitness
-	// run_fitness_sequence();
-	
 
 	dynamic_sleep(3);
 	vga_clear();
 	statusbar_init();
 
 	shell_run();
-	// halting
+
 	for (;;) {
 		__asm__ volatile ("hlt");
 	}

@@ -37,7 +37,7 @@ start:
 ;=====================================
 ; LOAD KERNEL FROM DISK
 ; we will load kernel to address 0x1000:0x0000, yes
-; BIOS int 0x13, AH=0x02 will read from the di*k(disk)
+; BIOS int 0x13, AH=0x02 will read from the di*k
 ;======================================
 
 load_kernel:
