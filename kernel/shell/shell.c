@@ -6,6 +6,8 @@
 #include "../drivers/timer.h"
 #include "../fitness/fitness.h"
 #include "../sys/statusbar.h"
+#include "../sys/reminder.h"
+#include "../drivers/speaker.h"
 
 //str helpers
 
@@ -263,6 +265,32 @@ static void cmd_motivation(int argc, char **argv) {
 	vga_println("Need help, this os is with you", COLOR_GREY);
 }
 
+// exposes pre-built sound effects to the user
+static void cmd_play(int argc, char** argv) {
+	if (argc < 2) {
+		vga_println("usage: play <song>", COLOR_YELLOW);
+		vga_println("songs: boot victory ping", COLOR_GREY); // I had to choose the best
+		return;
+	}
+
+	if (k_strcmp(argv[1], "boot") == 0) {
+		vga_println("Playing: boot jingle", COLOR_GREY);
+		sfx_boot();
+	} else if (k_strcmp(argv[1], "victory") == 0) {
+		vga_println("Playing: victory fanfare", COLOR_GREY);
+		sfx_workoutsync_done();
+	} else if (k_strcmp(argv[1], "ping") == 0) {
+		vga_println("Playing: reminder ping", COLOR_GREY);
+		sfx_reminder();
+	} else {
+		vga_print("OPPSIE unknown song: ", COLOR_RED);
+		vga_print(argv[1], COLOR_DEFAULT);
+		vga_println("Available: boot victory ping", COLOR_GREY);
+		sfx_error();
+	}
+}
+
+
 // command table
 typedef struct {
 	const char* name;
@@ -278,6 +306,7 @@ static const command_t commands[] = {
 	{ "uptime", cmd_uptime, "show time since boot" },
 	{ "about", cmd_about, "shows OS info" },
 	{ "reboot", cmd_reboot, "reboots the machine" },
+	{ "play", cmd_play, "play <song> - boot/victory/ping" },
 	//fitness
 	{ "workout", cmd_workout, "run the full workout sequence" },
 	{ "exercise", cmd_exercise, "exercise <name> <secs> - one set" },
@@ -319,6 +348,7 @@ static void dispatch(int argc, char** argv) {
 	}
 
 	// unknown command
+	sfx_error();
 	vga_print("Oopsie :(, Unknown command: ", COLOR_RED);
 	vga_println(argv[0], COLOR_DEFAULT);
 	vga_println("Respectfully type 'help' for a list of commands", COLOR_GREY);
@@ -331,6 +361,8 @@ void shell_run(void) {
 	char* argv[SHELL_ARGS_MAX];
 	int argc;
 
+	sfx_shell_ready();
+
 	vga_println("****************************************************", COLOR_YELLOW);
 	vga_println("     Welcome to MrOs, aware of water reminders??    ", COLOR_CYAN);
 	vga_println("            Type 'help' for commands ;)             ", COLOR_GREY);
@@ -339,6 +371,7 @@ void shell_run(void) {
 
 	while (1) {
 		statusbar_update(); // refresh uptime + msg timeout
+		reminder_process(); // play any pending reminder sounds
 
 		vga_print("#Mr> ", COLOR_GREEN);
 

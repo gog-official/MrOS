@@ -31,4 +31,8 @@ void reminder_init(void);
 void reminder_tick(void);
 void reminder_set_interval(unsigned int ticks);
 
+// call this from the shell loop to process any pending reminders
+// safe to call blocking functions from here (not in IRQ context)
+void reminder_process(void);
+
 #endif // !REMINDER_H

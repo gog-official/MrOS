@@ -9,6 +9,7 @@
 #include "../sys/reminder.h"
 #include "../drivers/keyboard.h"
 #include "../shell/shell.h"
+#include "../drivers/speaker.h"
 
 static volatile unsigned short* const vga_buf = (unsigned short*)VGA_ADDRESS;
 
@@ -197,6 +198,7 @@ void kmain(void) {
 	idt_init();
 	pic_remap();
 	timer_init();
+	speaker_init();
 	keyboard_init();
 
 	// draws rows 23-24 while interrupts are off. guarantees bar is visible before first irq fires
@@ -217,6 +219,7 @@ void kmain(void) {
 	// 	records the current tick as the baseline for the 90min countdown.
 	// 	Timer must be running (sti done) so timer_get_ticks() is meaningful.
 	reminder_init();
+	sfx_boot();
 
 
 	vga_println("==============================================", COLOR_CYAN);

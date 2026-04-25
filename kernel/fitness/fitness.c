@@ -3,6 +3,7 @@
 #include "../core/vga.h"
 #include "../drivers/timer.h"
 #include "../sys/statusbar.h"
+#include "../drivers/speaker.h"
 
 // the workout
 static const exercise_t workout[] = {
@@ -89,12 +90,16 @@ void run_single_excercise(const exercise_t* ex) {
 	vga_println("                                    ", COLOR_DEFAULT);
 	vga_println("                                    ", COLOR_DEFAULT);
 	vga_putchar('\n', COLOR_DEFAULT);
+	
+	sfx_workout_start();
 
 	for (int remaining = ex->duration; remaining >= 0; remaining --) {
 		draw_countdown(count_row, remaining, ex->duration);
 		statusbar_update();
 		if(remaining > 0) timer_sleep(1);
 	}
+
+	sfx_workout_done();
 
 	vga_clear_row(count_row);
 	vga_clear_row(bar_row);
@@ -104,6 +109,7 @@ void run_single_excercise(const exercise_t* ex) {
         int rest_row = count_row + 2;
 
         vga_set_cursor(rest_row, 0);
+	sfx_rest_start();
         for (int remaining = ex->rest; remaining >= 0; remaining--) {
             draw_rest(rest_row, remaining);
 	    statusbar_update();
@@ -131,4 +137,5 @@ void run_fitness_sequence(void) {
 	vga_println("    YEAH BUDDY,LIGHTWEIGHT!(done btw)   ", COLOR_CYAN);
 	vga_println("========================================", COLOR_CYAN);
 	vga_putchar('\n', COLOR_DEFAULT);
+	sfx_workoutsync_done();
 }

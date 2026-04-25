@@ -5,6 +5,7 @@
 #include "../interrupts/pic.h"
 #include "../core/vga.h"
 #include "../sys/statusbar.h"
+#include "../sys/reminder.h"
 
 // scancode table
 static const char sc_normal[88] = {
@@ -158,6 +159,7 @@ void keyboard_init(void) {
 char keyboard_getchar(void) {
 	while (buf_empty()) {
 		statusbar_update();
+		reminder_process(); // play pending reminder sounds while waiting for keyboard input
 		__asm__ volatile ("hlt");
 	}
 	return buf_pop();
@@ -169,6 +171,7 @@ void keyboard_readline(char* buf, int max) {
 	int pos = 0;
 	while (1) {
 		statusbar_update();
+		reminder_process(); // play any pending reminder sounds while waiting for input
 		char c = keyboard_getchar();
 
 		if (c == '\n') {

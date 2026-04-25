@@ -56,7 +56,7 @@ run: $(OS_IMAGE)
 	$(QEMU) -drive format=raw,file=$(OS_IMAGE) -nographic
 
 run-gui: $(OS_IMAGE)
-	$(QEMU) -drive format=raw,file=$(OS_IMAGE)
+	$(QEMU) -drive format=raw,file=$(OS_IMAGE) -audiodev pa,id=snd -machine pcspk-audiodev=snd
 
 clean:
 	rm -f $(BOOT_BIN) $(ENTRY_OBJ) $(C_OBJS) $(KERNEL_BIN) kernel/kernel.elf $(OS_IMAGE)

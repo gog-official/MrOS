@@ -2,8 +2,8 @@
 #include "statusbar.h"
 #include "../drivers/timer.h"
 #include "../core/vga.h"
+#include "../drivers/speaker.h"
 
-//last_reminder_tick:
 //Initialised to Water_interva_ticks so the FIRST reminder booms
 //exactly 90 mins after the boot, not immediately.
 // 
@@ -17,6 +17,10 @@ static unsigned int last_reminder_tick = 0;
 // track whether we showed the initial boot value
 static int initialised = 0;
 
+// flag to indicate a reminder should be played
+// set in IRQ context, checked in shell loop context
+static int reminder_pending = 0;
+
 void reminder_init(void) {
 	// set last_reminder_tick to 'now' so the first reminder fires
 	// 90 mins froom boot, not from time 0
@@ -25,7 +29,7 @@ void reminder_init(void) {
 }
 
 // changes the reminder interval to user defined time
-static unsigned int water_interval_ticks;
+static unsigned int water_interval_ticks = WATER_INTERVAL_TICKS;
 void reminder_set_interval(unsigned int ticks) {
 	if (ticks > 0) {
 		water_interval_ticks = ticks;
@@ -52,9 +56,19 @@ void reminder_tick(void) {
 
 	if ((now - last_reminder_tick) >= water_interval_ticks) {
 		last_reminder_tick = now;
-
+		reminder_pending = 1; // set flag instead of playing sound from IRQ context
+		
 		// statusbar_set_msg writes directly to vga memory. safe from IRQ
 		// context- no malloc, no blocking, no scroll. what a pride :D
 		statusbar_set_msg("DRINK WATER! Stay hydrated.", COLOR_CYAN);
+	}
+}
+
+// call this from the shell loop to check if a reminder needs to be played
+// this is safe because we're not in IRQ context, so we can call blocking functions
+void reminder_process(void) {
+	if (reminder_pending) {
+		reminder_pending = 0;
+		sfx_reminder();
 	}
 }
