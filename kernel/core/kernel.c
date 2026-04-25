@@ -258,7 +258,7 @@ void kmain(void) {
 	statusbar_init();
 	
 	// fitness
-	run_fitness_sequence();
+	// run_fitness_sequence();
 	
 
 	dynamic_sleep(3);
