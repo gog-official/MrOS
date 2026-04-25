@@ -22,6 +22,7 @@ SRCDIRS = \
 	 kernel/interrupts \
 	 kernel/shell \
 	 kernel/drivers \
+	 kernel/sys	\
 	 kernel/fitness
 
 KERNEL_BIN = kernel/kernel.bin

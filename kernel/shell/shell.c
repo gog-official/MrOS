@@ -5,6 +5,7 @@
 #include "../core/vga.h"
 #include "../drivers/timer.h"
 #include "../fitness/fitness.h"
+#include "../sys/statusbar.h"
 
 //str helpers
 
@@ -179,18 +180,6 @@ static void cmd_stats(int argc, char** argv) {
 	vga_println("", COLOR_DEFAULT);
 }
 
-// // helpers for general info commands
-int k_atoi(char *s) {
-	int result = 0;
-	int i = 0;
-
-	while (s[i] >= '0' && s[i] <= '9') {
-		result = result * 10 + (s[i] - '0');
-		i++;
-	}
-	return result;
-}
-
 // // general info commands
 static void cmd_protein(int argc, char **argv) {
 	if (argc < 3) {
@@ -349,6 +338,8 @@ void shell_run(void) {
 	vga_putchar('\n', COLOR_DEFAULT);
 
 	while (1) {
+		statusbar_update(); // refresh uptime + msg timeout
+
 		vga_print("#Mr> ", COLOR_GREEN);
 
 		keyboard_readline(line, SHELL_LINE_MAX);

@@ -3,6 +3,7 @@
 #include "timer.h"
 #include "../interrupts/idt.h"
 #include "../interrupts/pic.h"
+#include "../sys/reminder.h"
 
 // global tickie counter
 static volatile uint32_t ticks = 0;
@@ -12,6 +13,7 @@ extern void irq0_wrapper(void);
 
 void timer_irq_handler(void) {
 	ticks ++;
+	reminder_tick(); // check water reminder every tick
 	pic_send_eoi(0);
 }
 

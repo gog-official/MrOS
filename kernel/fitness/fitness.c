@@ -2,6 +2,7 @@
 #include "fitness.h"
 #include "../core/vga.h"
 #include "../drivers/timer.h"
+#include "../sys/statusbar.h"
 
 // the workout
 static const exercise_t workout[] = {
@@ -91,6 +92,7 @@ void run_single_excercise(const exercise_t* ex) {
 
 	for (int remaining = ex->duration; remaining >= 0; remaining --) {
 		draw_countdown(count_row, remaining, ex->duration);
+		statusbar_update();
 		if(remaining > 0) timer_sleep(1);
 	}
 
@@ -104,6 +106,7 @@ void run_single_excercise(const exercise_t* ex) {
         vga_set_cursor(rest_row, 0);
         for (int remaining = ex->rest; remaining >= 0; remaining--) {
             draw_rest(rest_row, remaining);
+	    statusbar_update();
             if (remaining > 0) timer_sleep(1);
         }
         vga_clear_row(rest_row);

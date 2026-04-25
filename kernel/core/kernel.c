@@ -5,6 +5,8 @@
 #include "../interrupts/pic.h"
 #include "../drivers/timer.h"
 #include "../fitness/fitness.h"
+#include "../sys/statusbar.h"
+#include "../sys/reminder.h"
 #include "../drivers/keyboard.h"
 #include "../shell/shell.h"
 
@@ -36,8 +38,12 @@ void vga_clear(void) {
 
 // shift every row up by one, blank the last row
 static void vga_scroll(void) {
+	// scroll ceiling is statusbar_divider_row -1 = row 22
+	// row 23-24 never touched ;) by the scroll path
+	//always keep statusbar safe
+	int scroll_limit = STATUSBAR_DIVIDER_ROW - 1;
 	// move up
-	for (int row = 0; row < VGA_ROWS -1; row++) {
+	for (int row = 0; row < scroll_limit; row++) {
 		for (int col = 0; col < VGA_COLS; col++) {
 			vga_buf[row * VGA_COLS + col] = vga_buf[(row + 1) * VGA_COLS + col];
 		}
@@ -45,11 +51,11 @@ static void vga_scroll(void) {
 
 	// blank the last row
 	for (int col = 0; col < VGA_COLS; col++) {
-		vga_set_cell(VGA_ROWS-1, col, ' ', COLOR_DEFAULT);
+		vga_set_cell(scroll_limit, col, ' ', COLOR_DEFAULT);
 	}
 
-	// kep cursor at last
-	cursor_row = VGA_ROWS -1;
+	// kep cursor at last row before status bar
+	cursor_row = scroll_limit -1;
 	cursor_col = 0;
 	vga_update_cursor(cursor_row, cursor_col);
 }
@@ -102,7 +108,7 @@ void vga_putchar(char c, uint8_t color) {
 	}
 	
 	// scroll if last row exceeded
-	if (cursor_row >= VGA_ROWS) {
+	if (cursor_row >= STATUSBAR_DIVIDER_ROW - 1) {
 		vga_scroll();
 	}
 	vga_update_cursor(cursor_row, cursor_col);
@@ -169,6 +175,28 @@ void vga_print_hex(uint32_t v, uint8_t color) {
     char buf[16]; vga_print("0x", color); itoa((int)v, buf, 16); vga_print(buf, color);
 }
 
+void dynamic_sleep(int interval) {
+	for (int i = 0; i < interval; i ++) {
+		statusbar_update();
+		timer_sleep(1);
+	}
+}
+
+int k_atoi(char *s) {
+	int result = 0;
+	int i = 0;
+
+	while (s[i] >= '0' && s[i] <= '9') {
+		result = result * 10 + (s[i] - '0');
+		i++;
+	}
+	return result;
+}
+
+// ===============================================
+// KMAIN - XD
+// ===============================================
+
 // after all screen setup, finally kmain
 void kmain(void) {
 	__asm__ volatile (
@@ -183,14 +211,30 @@ void kmain(void) {
 	pic_remap();
 	timer_init();
 	keyboard_init();
+
+	// draws rows 23-24 while interrupts are off. guarantees bar is visible before first irq fires
+	statusbar_init();
 	
 	// Enable interrupts
 	__asm__ volatile ("sti");
+	
+	// prompting user to enter their choice of time for water break interval
+	char buf[16];
+	vga_print("Enter water reminder interval(minutes) [default - 90]: ", COLOR_YELLOW);
+	keyboard_readline(buf, sizeof(buf));
+	int minutes = k_atoi(buf);
+	if (minutes <= 0) minutes = 90;
+	reminder_set_interval(minutes * 60 * 100);
+
+	// IMPORTANT: reminder_init is set after sti:
+	// 	records the current tick as the baseline for the 90min countdown.
+	// 	Timer must be running (sti done) so timer_get_ticks() is meaningful.
+	reminder_init();
 
 	// Banner for OS
 	vga_println("==============================================", COLOR_CYAN);
 	vga_println("             MrOS - Keeps you fit             ", COLOR_YELLOW);
-	vga_println("    Now with water timer, workout and infos   ", COLOR_YELLOW);
+	vga_println("   Now with water reminder, workout and infos ", COLOR_YELLOW);
 	vga_println("==============================================", COLOR_CYAN);
 	vga_putchar('\n', COLOR_DEFAULT);
 
@@ -208,16 +252,18 @@ void kmain(void) {
 	vga_putchar('\n', COLOR_DEFAULT);
 	
 	// Wait 5 seconds so user can read the boot messages
-	timer_sleep(5);
+	dynamic_sleep(5);
 	
 	vga_clear();
+	statusbar_init();
 	
 	// fitness
-//	run_fitness_sequence();
+	run_fitness_sequence();
 	
 
-	timer_sleep(3);
+	dynamic_sleep(3);
 	vga_clear();
+	statusbar_init();
 
 	shell_run();
 	// halting

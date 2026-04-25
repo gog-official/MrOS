@@ -4,6 +4,7 @@
 #include "../interrupts/idt.h"
 #include "../interrupts/pic.h"
 #include "../core/vga.h"
+#include "../sys/statusbar.h"
 
 // scancode table
 static const char sc_normal[88] = {
@@ -156,6 +157,7 @@ void keyboard_init(void) {
 
 char keyboard_getchar(void) {
 	while (buf_empty()) {
+		statusbar_update();
 		__asm__ volatile ("hlt");
 	}
 	return buf_pop();
@@ -166,6 +168,7 @@ char keyboard_getchar(void) {
 void keyboard_readline(char* buf, int max) {
 	int pos = 0;
 	while (1) {
+		statusbar_update();
 		char c = keyboard_getchar();
 
 		if (c == '\n') {
@@ -182,6 +185,7 @@ void keyboard_readline(char* buf, int max) {
 				if (cursor_col > 0) {
 					cursor_col --;
 					vga_set_cell(cursor_row, cursor_col, ' ', COLOR_DEFAULT);
+					vga_set_cursor(cursor_row, cursor_col);
 				}
 			}
 			continue;
