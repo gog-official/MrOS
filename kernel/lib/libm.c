@@ -117,5 +117,39 @@ double atan2(double y, double x) {
 		if (y < 0.0) return -HALF_PI;
 		return 0.0;
 	}
+	double a = atan(y/x);
+	if (x < 0.0){
+		if (y >= 0.0) return a + PI;
+		return a-PI;
+	}
+	return a; // this was simpler
+}
 
+// is power or exponent a good term for this?
+double pow(double base, double exp) {
+	// integer exponent fast path
+	int e = (int)exp;
+	if ((double)e == exp) {
+		double r = 1.0;
+		int neg = e < 0;
+		if (neg) e = -e;
+		while (e--) r *= base;
+		return neg ? 1.0 / r : r;
+	}
+	// general case, omit for now
+	return 0.0;
+}
+
+double log(double x) {
+	// ln(x) via identity ln(x) = 2*atanh((x-1)/(x+1))
+	if (x <= 0.0) return -1e15;
+	double y = (x - 1.0) / (x + 1.0);
+	double y2 = y*y;
+	double r = y;
+	double term = y;
+	for (int n = 1; n <= 16; n++) {
+		term *= y2;
+		r += term / (double)(2*n + 1);
+	}
+	return 2.0 * r;
 }
