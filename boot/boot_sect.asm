@@ -45,7 +45,7 @@ load_kernel:
 	call print_string
 
 	mov ah, 0x02
-	mov al, 100
+	mov al, 100 // enough for kernel and future plus doom glue
 
 	mov ch, 0
 	mov cl, 2
@@ -61,6 +61,66 @@ load_kernel:
 
 	mov si, msg_ok
 	call print_string
+
+; --------------------------------------
+; DETECT EXTENDED MEMORY
+;---------------------------------------
+detect_memory:
+	mov ax, 0xE801
+	int 0x15
+	jc .mem_fallback ; some crappy bios doesn't support E801 lol :(
+	; ax = kb betn 1mb and 16 mb while bx = 64kb blocks above 16mb
+	; store ax as a simple extended kb val
+	mov [0x0500], ax
+	jmp enable_a20
+
+.mem_fallback:
+	; we doin the old way AH=0x88 method
+	mov ah, 0x88
+	int 0x15
+	jc .mem_unknown
+	mov[0x0500], ax
+	jmp enable_a20
+
+.mem_unknown:
+	mov word [0x0500], 0 ; kernel assumes as minimum
+
+; ----------------------------------------------------
+; ENABLE A20 LINE
+;---------------------------------------------------
+enable_a20:
+	; method 1: bios
+	mov ax, 0x2401
+	int 0x15 ; lets ignore errors
+
+	; method 2: a20 via port 0x92
+	; bit 1 of it: a20 enable_a20
+	; bit 0: reset, donot set this or machine will rebooti
+	in al, 0x92
+	or al, 0x02 ; set bit 1
+	and al, 0xFE ; clear bit 0
+	out 0x92, al
+
+	; method 33: PS/2 controller
+	; wait for input buffer empty , send 0xD1 command
+	; then 0xDF
+	call .wait_ps2
+	mov al, 0xD1
+	out 0x64, al
+	call .wait_ps2
+	mov al, 0xDF
+	out 0x60, al
+	call .wait_ps2
+
+	mov si, msg_a20
+	call print_string
+	jmp enter_protected_mode
+
+.wait_ps2:
+	in al, 0x64
+	test al, 0x02 ; input buffer full?
+	jnz .wait_ps2
+	ret
 
 ; ---------------------------------------
 ; SWITCH TO PROTECTED MODE(32 btw)
