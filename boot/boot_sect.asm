@@ -45,7 +45,7 @@ load_kernel:
 	call print_string
 
 	mov ah, 0x02
-	mov al, 100 // enough for kernel and future plus doom glue
+	mov al, 100 ; enough for kernel and future plus doom glue
 
 	mov ch, 0
 	mov cl, 2
@@ -219,6 +219,7 @@ msg_boot db "MrOs is bootyng, ready for pump? ....", 0x0D, 0x0A, 0
 msg_loading db "Loading krnl from disk", 0x0D, 0x0A, 0
 msg_ok db "kernel loaded OK!", 0x0D, 0x0A, 0
 msg_error db " DISK READ ERROR! HAlting, LIGHTWEIGHT!!!", 0x0D, 0x0A, 0
+msg_a20 db "A20 :)", 0x0D, 0x0A, 0
 
 times 510-($-$$) db 0
 dw 0xaa55

@@ -115,6 +115,18 @@ void  mode13_enter(void) {
 	outb(VGA_CRTC_INDEX, 0x11);
 	outb(VGA_CRTC_DATA, inb(VGA_CRTC_DATA)& ~ 0x80);
 
+	outb(VGA_MISC_WRITE, MODE13_MISC);
+	write_regs_seq (mode13_seq, ARRAY_LEN(mode13_seq));
+	write_regs_crtc(mode13_crtc, ARRAY_LEN(mode13_crtc));
+	write_regs_gc (mode13_gc, ARRAY_LEN(mode13_gc));
+	write_regs_ac (mode13_ac, ARRAY_LEN(mode13_ac));
+}
+
+void mode13_exit(void) {
+	// unlock the CRTC reggies 0-7
+	outb(VGA_CRTC_INDEX, 0x11);
+	outb(VGA_CRTC_DATA, inb(VGA_CRTC_DATA)& ~ 0x80);
+
 	outb(VGA_MISC_WRITE, MODE3_MISC);
 	write_regs_seq (mode3_seq, ARRAY_LEN(mode3_seq));
 	write_regs_crtc(mode3_crtc, ARRAY_LEN(mode3_crtc));
@@ -122,7 +134,7 @@ void  mode13_enter(void) {
 	write_regs_ac (mode3_ac, ARRAY_LEN(mode3_ac));
 }
 
-void mode12_blit(const uint8_t* src) {
+void mode13_blit(const uint8_t* src) {
 	memcpy(MODE13_BUFFER, src, MODE13_PIXELS);
 }
 

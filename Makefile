@@ -5,11 +5,12 @@ NASM = nasm
 QEMU = qemu-system-i386
 OBJCOPY = i686-elf-objcopy
 
-INCLUDES = -Ikernel/core -Ikernel/interrupts -Ikernel/drivers -Ikernel/fitness -Ikernel/shell
+INCLUDES = -Ikernel/core -Ikernel/interrupts -Ikernel/drivers -Ikernel/fitness -Ikernel/shell -Ikernel/lib -Iinclude
 CFLAGS = -D__STDC_HOSTED__=0 -Ikernel/include -m32 -ffreestanding \
           -fno-builtin -fno-stack-protector -nostdlib \
           -Wall -Wextra -O2 $(INCLUDES) -Ikernel \
-          -fno-merge-constants -fno-jump-tables -fno-pic
+          -fno-merge-constants -fno-jump-tables -fno-pic \
+          -include stdint.h
 LDFLAGS = -m elf_i386 -nostdlib -T linker.ld
 
 # O files
@@ -23,12 +24,32 @@ SRCDIRS = \
 	 kernel/shell \
 	 kernel/drivers \
 	 kernel/sys	\
-	 kernel/fitness
+	 kernel/fitness \
+	 kernel/lib
 
 KERNEL_BIN = kernel/kernel.bin
 OS_IMAGE = mros.img
 
 C_SRCS := $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c))
+C_SRCS := $(filter-out kernel/doom/stub.c,$(C_SRCS))
+# Exclude platform-specific doomgeneric implementations
+C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_allegro.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_sdl.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_emscripten.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_linuxvt.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_soso.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_sosox.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_win.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_xlib.c,$(C_SRCS))
+# Exclude sound/music implementations that require external libraries
+C_SRCS := $(filter-out doom_src/doomgeneric/i_allegromusic.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/i_allegrosound.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/i_sdlmusic.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/i_sdlsound.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/i_cdmus.c,$(C_SRCS))
+# Exclude other platform-specific files
+C_SRCS := $(filter-out doom_src/doomgeneric/i_joystick.c,$(C_SRCS))
+C_SRCS := $(filter-out doom_src/doomgeneric/gusconf.c,$(C_SRCS))
 C_OBJS := $(patsubst %.c,%.o,$(C_SRCS))
 
 all: $(OS_IMAGE)

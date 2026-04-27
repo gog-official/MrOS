@@ -8,6 +8,7 @@
 #include "../sys/statusbar.h"
 #include "../sys/reminder.h"
 #include "../drivers/speaker.h"
+#include "../doom/doomgeneric_mros.h"
 
 //str helpers
 
@@ -290,6 +291,15 @@ static void cmd_play(int argc, char** argv) {
 	}
 }
 
+//doooooooooooooooooooooooom
+static void cmd_doom(int argc, char** argv) {
+	(void)argc; (void)argv;
+	vga_println("Launching doom...", COLOR_GREY);
+	vga_println("make sure doom1.wad is embedded at sector 128", COLOR_YELLOW);
+	timer_sleep(2);
+	doom_launch();
+}
+
 
 // command table
 typedef struct {
@@ -307,6 +317,7 @@ static const command_t commands[] = {
 	{ "about", cmd_about, "shows OS info" },
 	{ "reboot", cmd_reboot, "reboots the machine" },
 	{ "play", cmd_play, "play <song> - boot/victory/ping" },
+	{ "doom", cmd_doom, "plays doom, requires doom1.wad on disk" },
 	//fitness
 	{ "workout", cmd_workout, "run the full workout sequence" },
 	{ "exercise", cmd_exercise, "exercise <name> <secs> - one set" },
