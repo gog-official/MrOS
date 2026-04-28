@@ -31,25 +31,6 @@ KERNEL_BIN = kernel/kernel.bin
 OS_IMAGE = mros.img
 
 C_SRCS := $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c))
-C_SRCS := $(filter-out kernel/doom/stub.c,$(C_SRCS))
-# Exclude platform-specific doomgeneric implementations
-C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_allegro.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_sdl.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_emscripten.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_linuxvt.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_soso.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_sosox.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_win.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/doomgeneric_xlib.c,$(C_SRCS))
-# Exclude sound/music implementations that require external libraries
-C_SRCS := $(filter-out doom_src/doomgeneric/i_allegromusic.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/i_allegrosound.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/i_sdlmusic.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/i_sdlsound.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/i_cdmus.c,$(C_SRCS))
-# Exclude other platform-specific files
-C_SRCS := $(filter-out doom_src/doomgeneric/i_joystick.c,$(C_SRCS))
-C_SRCS := $(filter-out doom_src/doomgeneric/gusconf.c,$(C_SRCS))
 C_OBJS := $(patsubst %.c,%.o,$(C_SRCS))
 
 all: $(OS_IMAGE)
