@@ -10,6 +10,8 @@
 #include "../drivers/keyboard.h"
 #include "../shell/shell.h"
 #include "../drivers/speaker.h"
+#include "../drivers/ata/ata.h"
+#include "../fs/vfs.h"
 
 static volatile unsigned short* const vga_buf = (unsigned short*)VGA_ADDRESS;
 
@@ -203,10 +205,24 @@ void kmain(void) {
 
 	// draws rows 23-24 while interrupts are off. guarantees bar is visible before first irq fires
 	statusbar_init();
+	if (ata_init() == ATA_OK) {
+		vga_print("[OK] ATA drive         ", COLOR_GREEN);
+		vga_println("disk detected",          COLOR_GREY);
+		if (vfs_init() == 0) {
+			vga_print("[OK] FAT12 filesystem  ", COLOR_GREEN);
+			vga_println("mounted",                COLOR_GREY);
+		} else {
+			vga_print("[--] FAT12 filesystem  ", COLOR_YELLOW);
+			vga_println("mount failed",           COLOR_GREY);
+		}
+	} else {
+		vga_print("[--] ATA drive         ", COLOR_YELLOW);
+		vga_println("no disk (filesystem unavailable)", COLOR_GREY);
+	}
 	
 	// Enable interrupts
 	__asm__ volatile ("sti");
-	
+
 	// prompting user to enter their choice of time for water break interval
 	char buf[16];
 	vga_print("Enter water reminder interval(minutes) [default - 90]: ", COLOR_YELLOW);

@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define FS_SECTOR_OFFSET 256
+
 //global state
 static fat12_fs_t fs;
 static fat12_bpb_t bpb;
@@ -89,7 +91,6 @@ static void fat12_str_to_83(const char* str, uint8_t* name8, uint8_t* ext3) {
 	int i = 0, j = 0;
 	while (str[j] && str[j] != '.' && i < 8) {
 		char c = str[j++];
-		if (c >= 'a' && c <= 'z') c -= 32;
 		name8[i++] = (uint8_t)c;
 	}
 	if (str[j] == '.') {
@@ -97,7 +98,6 @@ static void fat12_str_to_83(const char* str, uint8_t* name8, uint8_t* ext3) {
 		i = 0;
 		while (str[j] && i < 3) {
 			char c = str[j++];
-			if (c >= 'a' && c <= 'z') c -= 32;
 			ext3[i++] = (uint8_t)c;
 		}
 	}
@@ -143,13 +143,14 @@ static int fat12_find_entry(const char* name, fat12_dirent_t* out) {
 // VFS OPS IMPLEMENTATION!!!!!!
 static int fat12_mount(void) {
 	uint8_t boot[512];
-	if (ata_read_sectors(0, 1, boot) != ATA_OK) return -1;
+	uint32_t partition_start = 256;
+	if (ata_read_sectors(partition_start, 1, boot) != ATA_OK) return -1;
 	memcpy(&bpb, boot, sizeof(fat12_bpb_t));
 
 	if (bpb.bytes_per_sector != 512) return -1;
 	
-	fs.fat_start_sector = bpb.reserved_sectors;
-	fs.root_start_sector = fs.fat_start_sector + (uint32_t)bpb.num_fats * bpb.sectors_per_fat;
+	fs.fat_start_sector = partition_start + bpb.reserved_sectors;
+	fs.root_start_sector = partition_start + fs.fat_start_sector + (uint32_t)bpb.num_fats * bpb.sectors_per_fat;
 	fs.root_dir_sectors = (bpb.root_entry_count * 32 + 511) / 512;
 	fs.data_start_sector = fs.root_start_sector + fs.root_dir_sectors;
 	fs.sectors_per_cluster = bpb.sectors_per_cluster;

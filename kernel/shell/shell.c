@@ -8,6 +8,7 @@
 #include "../sys/statusbar.h"
 #include "../sys/reminder.h"
 #include "../drivers/speaker.h"
+#include "../fs/vfs.h"
 
 //str helpers
 
@@ -290,6 +291,15 @@ static void cmd_play(int argc, char** argv) {
 	}
 }
 
+// forward decl
+void cmd_ls (int argc, char** argv);
+void cmd_cat (int argc, char** argv);
+void cmd_cd (int argc, char** argv);
+void cmd_write (int argc, char** argv);
+void cmd_rm (int argc, char** argv);
+void cmd_mkdir (int argc, char** argv);
+void cmd_stat (int argc, char** argv);
+
 
 
 // command table
@@ -308,6 +318,14 @@ static const command_t commands[] = {
 	{ "about", cmd_about, "shows OS info" },
 	{ "reboot", cmd_reboot, "reboots the machine" },
 	{ "play", cmd_play, "play <song> - boot/victory/ping" },
+	//fs
+	{ "ls", cmd_ls, "ls [path] lists directory" },
+	{ "cat", cmd_cat, "cat <file> prints file content" },
+	{ "cd", cmd_cd, "cd <path> changes directory" },
+	{ "write", cmd_write, "write <file> <text> writes text to file" },
+	{ "rm", cmd_rm, "rm <file> removes file" },
+	{ "mkdir", cmd_mkdir, "mkdir <name> makes the directory" },
+	{ "stat", cmd_stat, "stat <file> shows file info" },
 	//fitness
 	{ "workout", cmd_workout, "run the full workout sequence" },
 	{ "exercise", cmd_exercise, "exercise <name> <secs> - one set" },
