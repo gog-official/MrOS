@@ -69,24 +69,48 @@ void cmd_cd(int argc, char** argv) {
 		return;
 	}
 
-	if (strcmp(argv[1], "/") == 0 || strcmp(argv[1], "..") == 0) {
+	if (strcmp(argv[1], "/") == 0) {
 		strcpy(vfs_cwd, "/");
-	} else {
-		static vfs_node_t entries[VFS_MAX_DIR_ENTRIED];
-		int count = vfs_readdir("/", entries, VFS_MAX_DIR_ENTRIED);
-		int found = 0;
-		for (int i = 0; i < count; i++) {
-			if(entries[i].type == VFS_TYPE_DIR && strcmp(entries[i].name, argv[1]) == 0) {
-				found = 1; break;
+	} else if (strcmp(argv[1], "..") == 0) {
+		// Go up one directory
+		if (strcmp(vfs_cwd, "/") == 0) {
+			// Already at root
+			strcpy(vfs_cwd, "/");
+		} else {
+			// Find last slash and terminate there
+			int last_slash = -1;
+			for (int i = 1; vfs_cwd[i] != '\0'; i++) {
+				if (vfs_cwd[i] == '/') last_slash = i;
+			}
+			if (last_slash > 0) {
+				vfs_cwd[last_slash] = '\0';
+			} else {
+				strcpy(vfs_cwd, "/");
 			}
 		}
-		if  (!found) {
-			vga_print("cd: maybe some planks may restore them? no such directory: ", COLOR_RED);
+	} else {
+		// Resolve the path
+		char new_path[VFS_MAX_PATH];
+		if (argv[1][0] == '/') {
+			strcpy(new_path, argv[1]);
+		} else if (strcmp(vfs_cwd, "/") == 0) {
+			strcpy(new_path, "/");
+			strcat(new_path, argv[1]);
+		} else {
+			strcpy(new_path, vfs_cwd);
+			strcat(new_path, "/");
+			strcat(new_path, argv[1]);
+		}
+
+		// Check if directory exists by trying to read it
+		static vfs_node_t entries[VFS_MAX_DIR_ENTRIED];
+		int count = vfs_readdir(new_path, entries, VFS_MAX_DIR_ENTRIED);
+		if (count < 0) {
+			vga_print("cd: no such directory: ", COLOR_RED);
 			vga_println(argv[1], COLOR_DEFAULT);
 			return;
 		}
-		strcpy(vfs_cwd, "/");
-		strcat(vfs_cwd, argv[1]);
+		strcpy(vfs_cwd, new_path);
 	}
 	vga_print("cwd: ", COLOR_GREY);
 	vga_println(vfs_cwd, COLOR_DEFAULT);
