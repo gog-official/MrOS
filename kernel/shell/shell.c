@@ -392,7 +392,9 @@ void shell_run(void) {
 		statusbar_update(); // refresh uptime + msg timeout
 		reminder_process(); // play any pending reminder sounds
 
-		vga_print("#Mr> ", COLOR_GREEN);
+		vga_print("Mr: ", COLOR_GREEN);
+		vga_print(vfs_cwd, COLOR_CYAN);
+		vga_print("> ", COLOR_GREEN);
 
 		keyboard_readline(line, SHELL_LINE_MAX);
 		cmd_parse(line, argv, &argc);
