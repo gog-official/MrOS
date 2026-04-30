@@ -5,7 +5,7 @@ NASM = nasm
 QEMU = qemu-system-i386
 OBJCOPY = i686-elf-objcopy
 
-INCLUDES = -Ikernel/core -Ikernel/interrupts -Ikernel/drivers -Ikernel/driver/ata -Ikernel/fitness -Ikernel/shell -Ikernel/lib -Ikernel/fs -Ikernel/fs/fat32 -Iinclude
+INCLUDES = -Ikernel/core -Ikernel/interrupts -Ikernel/drivers -Ikernel/driver/ata -Ikernel/fitness -Ikernel/shell -Ikernel/lib -Ikernel/fs -Ikernel/fs/fat32 -Ikernel/crypto -Ikernel/auth -Iinclude
 CFLAGS = -D__STDC_HOSTED__=0 -Ikernel/include -m32 -ffreestanding \
           -fno-builtin -fno-stack-protector -nostdlib \
           -Wall -Wextra -O2 $(INCLUDES) -Ikernel \
@@ -29,6 +29,8 @@ SRCDIRS = \
 	 kernel/lib \
 	 kernel/fs \
 	 kernel/fs/fat12 \
+	 kernel/crypto \
+	 kernel/auth 
 
 KERNEL_BIN = kernel/kernel.bin
 OS_IMAGE = mros.img

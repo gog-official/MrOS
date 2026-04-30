@@ -16,11 +16,11 @@ void uint32_to_hex(uint32_t val, char* out) {
 }
 
 void uint16_to_hex(uint16_t val, char* out) {
-	for (int i = 4; i >= 0; i--) {
+	for (int i = 3; i >= 0; i--) {
 		out[i] = hex_digit(val & 0xF);
 		val >>= 4;
 	}
-	out[8] = '\0';
+	out[4] = '\0';
 }
 
 uint32_t hex_to_uint32(const char* hex) {
@@ -50,7 +50,9 @@ static uint32_t djb2(const char* str, uint32_t seed) {
 
 void hash_password(const char* password, uint32_t salt, char* out_hex) {
 	char salted[128];
+	salted[0] = '\0';
 	char salt_str[9];
+	strcat(salted, salt_str);
 	uint32_to_hex(salt, salt_str);
 	strcat(salted, ":");
 	strcat(salted, password);

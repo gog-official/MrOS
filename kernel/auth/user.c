@@ -47,7 +47,7 @@ static int serialize_user(const user_t* u, char* buf) {
 	for (int i = 0; i < 4; i++) buf[pos++] = u->salt_hex[i];
 	buf[pos++] = ':';
 
-	for (int i = 0; i < 8; i++) buf[pos++] = u->salt_hex[i];
+	for (int i = 0; i < 8; i++) buf[pos++] = u->hash_hex[i];
 	buf[pos++] = ':';
 
 	buf[pos++] = '0' + u->flags;
@@ -169,12 +169,12 @@ int user_create(const char* username, const char* password, uint8_t flags) {
 	if (slot < 0) return -2;
 
 	// hash password
-	uint32_t salt = hash_generate_salt(username);
+	uint32_t salt = hash_generate_salt(username)& 0xFFFF;
 	char hash_hex[9];
 	hash_password(password, salt, hash_hex);
 
 	char salt_hex[5];
-	uint16_to_hex((uint16_t)(salt & 0xFFFF), salt_hex);
+	uint16_to_hex((uint16_t)salt, salt_hex);
 
 	char full_salt_hex[9];
 	uint32_to_hex(salt, full_salt_hex);
@@ -206,7 +206,7 @@ int user_change_password(const char* username, const char *new_password) {
 	user_t* u = user_find(username);
 	if (!u) return -1;
 
-	uint32_t salt = hash_generate_salt(username);
+	uint32_t salt = hash_generate_salt(username) & 0xFFFF;
 	char hash_hex[9];
 	hash_password(new_password, salt, hash_hex);
 	char salt_hex[5];

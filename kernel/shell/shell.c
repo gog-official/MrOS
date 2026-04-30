@@ -9,6 +9,7 @@
 #include "../sys/reminder.h"
 #include "../drivers/speaker.h"
 #include "../fs/vfs.h"
+#include "../auth/auth.h"
 
 //str helpers
 
@@ -299,6 +300,12 @@ void cmd_write (int argc, char** argv);
 void cmd_rm (int argc, char** argv);
 void cmd_mkdir (int argc, char** argv);
 void cmd_stat (int argc, char** argv);
+void cmd_whoami(int argc, char** argv);
+void cmd_users(int argc, char** argv);
+void cmd_useradd(int argc, char** argv);
+void cmd_userdel(int argc, char** argv);
+void cmd_passwd(int argc, char** argv);
+void cmd_logout(int argc, char** argv);
 
 
 
@@ -326,6 +333,13 @@ static const command_t commands[] = {
 	{ "rm", cmd_rm, "rm <file> removes file" },
 	{ "mkdir", cmd_mkdir, "mkdir <name> makes the directory" },
 	{ "stat", cmd_stat, "stat <file> shows file info" },
+	//auth
+	{ "whoami", cmd_whoami, "shows username" },
+	{ "users", cmd_users, "lists all users(admin only)" },
+	{ "useradd", cmd_useradd, "useradd <name>, adds user (admin only)" },
+	{ "userdel", cmd_userdel, "userdel <name>, deletes user(admin only)" },
+	{ "passwd", cmd_passwd, "passwd [user or empty for you], changes password" },
+	{ "logout", cmd_logout, "ends teh session" },
 	//fitness
 	{ "workout", cmd_workout, "run the full workout sequence" },
 	{ "exercise", cmd_exercise, "exercise <name> <secs> - one set" },
@@ -389,10 +403,13 @@ void shell_run(void) {
 	vga_putchar('\n', COLOR_DEFAULT);
 
 	while (1) {
+		if (!current_session.logged_in) return;
+
 		statusbar_update(); // refresh uptime + msg timeout
 		reminder_process(); // play any pending reminder sounds
 
-		vga_print("Mr: ", COLOR_GREEN);
+		vga_print(current_session.username, COLOR_YELLOW);
+		vga_print("@gymbro:", COLOR_DEFAULT);
 		vga_print(vfs_cwd, COLOR_CYAN);
 		vga_print("> ", COLOR_GREEN);
 

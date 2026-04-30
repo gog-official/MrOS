@@ -12,6 +12,7 @@
 #include "../drivers/speaker.h"
 #include "../drivers/ata/ata.h"
 #include "../fs/vfs.h"
+#include "../auth/auth.h"
 
 static volatile unsigned short* const vga_buf = (unsigned short*)VGA_ADDRESS;
 
@@ -237,6 +238,9 @@ void kmain(void) {
 	reminder_init();
 	sfx_boot();
 
+	
+	vga_clear();
+	statusbar_init();
 
 	vga_println("==============================================", COLOR_CYAN);
 	vga_println("             MrOS - Keeps you fit             ", COLOR_YELLOW);
@@ -259,16 +263,31 @@ void kmain(void) {
 	
 	// Wait 5 seconds so user can read the boot messages
 	dynamic_sleep(5);
+
 	
 	vga_clear();
 	statusbar_init();
-	
-
+	// run_fitness_sequence();
 	dynamic_sleep(3);
 	vga_clear();
 	statusbar_init();
 
-	shell_run();
+	auth_init();
+	
+	
+	vga_clear();
+	statusbar_init();
+
+	while (1) {
+		auth_login_prompt();
+		vga_clear();
+		statusbar_init();
+
+		shell_run();
+		vga_clear();
+		statusbar_init();
+	}
+	
 
 	for (;;) {
 		__asm__ volatile ("hlt");
