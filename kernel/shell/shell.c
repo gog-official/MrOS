@@ -386,7 +386,7 @@ static const command_t commands[] = {
 	{ "echo", cmd_echo, "echo [text]  - print text" },
 	{ "uptime", cmd_uptime, "show time since boot" },
 	{ "about", cmd_about, "shows OS info" },
-	{ "reboot", cmd_reboot, "reboots the machine" },
+	// { "reboot", cmd_reboot, "reboots the machine" },
 	{ "play", cmd_play, "play <song> - boot/victory/ping" },
 	//fs
 	{ "ls", cmd_ls, "ls [path] lists directory" },
