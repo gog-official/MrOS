@@ -140,6 +140,10 @@ So, I wanted to set an example by reminding people deep inside tech, how importa
 
 ## Preview
 
+### Video
+![video;)](https://cdn.hackclub.com/019de468-4788-7ca3-8986-6a4c7b494650/screenrecording-2026-05-01_22-08-23%20(online-video-cutter.com).mp4)
+
+### Static videos
 ![Kernel](https://cdn.hackclub.com/019de41b-9a2b-7ce0-bb17-0dca656a5a45/screenshot-2026-05-01_20-56-16.png)
 ![Fitness](https://cdn.hackclub.com/019de41b-c834-7c13-a21b-ab90c68378ee/screenshot-2026-05-01_20-58-04.png)
 ![login](https://cdn.hackclub.com/019de41b-e033-71bc-a378-34e7aea363da/screenshot-2026-05-01_20-59-36.png)
