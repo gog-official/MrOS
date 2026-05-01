@@ -141,7 +141,10 @@ So, I wanted to set an example by reminding people deep inside tech, how importa
 ## Preview
 
 ### Video
-![video;)](https://cdn.hackclub.com/019de468-4788-7ca3-8986-6a4c7b494650/screenrecording-2026-05-01_22-08-23%20(online-video-cutter.com).mp4)
+<video width="800" controls preload="metadata" poster="thumbnail.png">
+  <source src="https://cdn.hackclub.com/019de468-4788-7ca3-8986-6a4c7b494650/screenrecording-2026-05-01_22-08-23%20(online-video-cutter.com).mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ### Static videos
 ![Kernel](https://cdn.hackclub.com/019de41b-9a2b-7ce0-bb17-0dca656a5a45/screenshot-2026-05-01_20-56-16.png)
