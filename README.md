@@ -129,19 +129,14 @@ So, I wanted to set an example by reminding people deep inside tech, how importa
 - `qemu-system-i386`
 - `python3`, `make`
 
-### commands
+### Commands
 
-| Command       | Effects
-|
-|---------------|----------------------------------------------------|
-| `make`        | Build `mros.img`
-|
-| `make run`    | Useless, runs in text mode
-|
-| `make run-gui`| Run in QEMU **with PC speaker audio** (PulseAudio)
-|
-| `make clean`  | Remove all build artefacts
-|
+| Command | Effect |
+|:---|:---|
+| `make`         | 🛠️ Build `mros.img` |
+| `make run`     | 🖥️ Useless, runs in text mode |
+| `make run-gui` | 🎧 Run in QEMU **with PC speaker audio** (PulseAudio) |
+| `make clean`   | 🧹 Remove all build artefacts |
 
 ## Preview
 
