@@ -131,12 +131,29 @@ So, I wanted to set an example by reminding people deep inside tech, how importa
 
 ### Commands
 
-| Command | Effect |
-|:---|:---|
-| `make`         | 🛠️ Build `mros.img` |
-| `make run`     | 🖥️ Useless, runs in text mode |
-| `make run-gui` | 🎧 Run in QEMU **with PC speaker audio** (PulseAudio) |
-| `make clean`   | 🧹 Remove all build artefacts |
+<div style="display: flex; flex-wrap: wrap; gap: 1.2rem; justify-content: center;">
+
+  <div style="flex: 1 1 160px; border: 2px solid #3b82f6; border-radius: 16px; padding: 1em; background: #eff6ff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
+    <code style="font-size: 1.1em; background: #dbeafe; padding: 0.2em 0.6em; border-radius: 8px;">make</code>
+    <p style="margin: 0.5em 0 0 0;">Build <code>mros.img</code></p>
+  </div>
+
+  <div style="flex: 1 1 160px; border: 2px solid #6b7280; border-radius: 16px; padding: 1em; background: #f3f4f6; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
+    <code style="font-size: 1.1em; background: #e5e7eb; padding: 0.2em 0.6em; border-radius: 8px;">make run</code>
+    <p style="margin: 0.5em 0 0 0;">Useless, runs in text mode</p>
+  </div>
+
+  <div style="flex: 1 1 160px; border: 2px solid #0891b2; border-radius: 16px; padding: 1em; background: #ecfeff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
+    <code style="font-size: 1.1em; background: #cffafe; padding: 0.2em 0.6em; border-radius: 8px;">make run-gui</code>
+    <p style="margin: 0.5em 0 0 0;">Run in QEMU <strong>with PC speaker audio</strong> (PulseAudio)</p>
+  </div>
+
+  <div style="flex: 1 1 160px; border: 2px solid #ef4444; border-radius: 16px; padding: 1em; background: #fef2f2; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
+    <code style="font-size: 1.1em; background: #fee2e2; padding: 0.2em 0.6em; border-radius: 8px;">make clean</code>
+    <p style="margin: 0.5em 0 0 0;">Remove all build artefacts</p>
+  </div>
+
+</div>
 
 ## Preview
 
