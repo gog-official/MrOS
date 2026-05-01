@@ -48,46 +48,77 @@ So, I wanted to set an example by reminding people deep inside tech, how importa
 
 ## Buffs
 
-### Core & boot
-```
-    - **Custom boot sector**: real mode, loads the kernel via `INT 0x13`
-    - **A20 gate** with 3 fallback methods
-    - **Protected mode switch**: flat 4 GB GDT, `CR0.PE` bit
-    - **VGA text driver**: 80x25 with hardware cursor, scroll and a nice old statusbar(at 23-24 row)
+<div style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;">
 
-### Kernel Subsystems
-    - **Interruprs**: IDT, PIC remap, `outb`/`inb` port I/O
-    - **PS/2 keyboard** + cuter PIT timer (100 Hz / 10 ms tick)
-    - **PC speaker**: square-wave melodies (channel 2)
-    - **ATA disk** driver
+  <div style="flex: 1 1 280px; border: 2px solid #4f46e5; border-radius: 16px; padding: 1.2em; background: #f0f4ff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    <h3 style="margin-top:0; color:#4338ca;">Core & boot</h3>
+    <ul style="margin:0; padding-left:1.2em;">
+      <li><strong>Custom boot sector</strong>: real mode, loads the kernel via <code>INT 0x13</code></li>
+      <li><strong>A20 gate</strong> with 3 fallback methods</li>
+      <li><strong>Protected mode switch</strong>: flat 4 GB GDT, <code>CR0.PE</code> bit</li>
+      <li><strong>VGA text driver</strong>: 80x25 with hardware cursor, scroll and a nice old statusbar(at 23-24 row)</li>
+    </ul>
+  </div>
 
-### Filesystem
-    - **VFS abstraction layer** + FAT12 backend
-    - Full CRUD, kinda: `open`, `read`, `write`, `create`, `remove`, `mkdir`, `readdir`
+  <div style="flex: 1 1 280px; border: 2px solid #0891b2; border-radius: 16px; padding: 1.2em; background: #ecfeff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    <h3 style="margin-top:0; color:#0e7490;">Kernel Subsystems</h3>
+    <ul style="margin:0; padding-left:1.2em;">
+      <li><strong>Interruprs</strong>: IDT, PIC remap, <code>outb</code>/<code>inb</code> port I/O</li>
+      <li><strong>PS/2 keyboard</strong> + cuter PIT timer (100 Hz / 10 ms tick)</li>
+      <li><strong>PC speaker</strong>: square-wave melodies (channel 2)</li>
+      <li><strong>ATA disk</strong> driver</li>
+    </ul>
+  </div>
 
-### User & Auth
-    - **User accounts** with admin and normal flags, individual home directories
-    - **Login** with 3-attempt lockout (15 s cooldown) (no roast, trust me)
-    - **Hashing ans stuff**: DJB2 double-pass, salted with username + timer + knuth shuffle
-    **IMPORTANT**: first boot wizard creates the initial admin
+  <div style="flex: 1 1 280px; border: 2px solid #ca8a04; border-radius: 16px; padding: 1.2em; background: #fef9c3; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    <h3 style="margin-top:0; color:#a16207;">Filesystem</h3>
+    <ul style="margin:0; padding-left:1.2em;">
+      <li><strong>VFS abstraction layer</strong> + FAT12 backend</li>
+      <li>Full CRUD, kinda: <code>open</code>, <code>read</code>, <code>write</code>, <code>create</code>, <code>remove</code>, <code>mkdir</code>, <code>readdir</code></li>
+    </ul>
+  </div>
 
-### Fitness & Health(might be first time you see this in a github repo lol)
-    - **Mandatory Workout**: 40s pushups - 10s rest - 50s squats(can't skip this -_-)
-    - Custom excercise times, like you can make your own workout (`exercise BURPEE 30`)
-    - **Nutrition macors**: `protein`, `fat`, `carbs` calculators
-    - Wootaah reminder (default 1.5 hours water reminder)
-    - Workout stats & motivational quotes
+  <div style="flex: 1 1 280px; border: 2px solid #b91c1c; border-radius: 16px; padding: 1.2em; background: #fee2e2; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    <h3 style="margin-top:0; color:#991b1b;">User & Auth</h3>
+    <ul style="margin:0; padding-left:1.2em;">
+      <li><strong>User accounts</strong> with admin and normal flags, individual home directories</li>
+      <li><strong>Login</strong> with 3-attempt lockout (15 s cooldown) (no roast, trust me)</li>
+      <li><strong>Hashing ans stuff</strong>: DJB2 double-pass, salted with username + timer + knuth shuffle</li>
+    </ul>
+    <p style="margin: 0.5em 0 0 0; font-style: italic; background: #fecaca; padding: 0.3em 0.6em; border-radius: 8px; font-weight: bold;">IMPORTANT: first boot wizard creates the initial admin</p>
+  </div>
 
-### UI & shell
-    - **Status bar**: shows uptime + timed message on protected rows
-    - **Scrollback buffer**: HEY, `Ctrl+UP/Dwn` or `pg up/down`
-    - **Interactive shells**: prompt `user@gymbro:/cwd>` and 25 builtin commands
+  <div style="flex: 1 1 280px; border: 2px solid #16a34a; border-radius: 16px; padding: 1.2em; background: #dcfce7; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    <h3 style="margin-top:0; color:#166534;">Fitness & Health (might be first time you see this in a github repo lol)</h3>
+    <ul style="margin:0; padding-left:1.2em;">
+      <li><strong>Mandatory Workout</strong>: 40s pushups - 10s rest - 50s squats (can't skip this -_-)</li>
+      <li>Custom excercise times, like you can make your own workout (<code>exercise BURPEE 30</code>)</li>
+      <li><strong>Nutrition macors</strong>: <code>protein</code>, <code>fat</code>, <code>carbs</code> calculators</li>
+      <li>Wootaah reminder (default 1.5 hours water reminder)</li>
+      <li>Workout stats & motivational quotes</li>
+    </ul>
+  </div>
 
-### Vi-like Editor
-    - Modal editor: Normal, Insert, Command, Search
-    - `hjkl`, word motions, `0`/`$`, `gg`/`G`
-    - Undo, search (`/term` + `n`), `:w` / `:q`/ `:wq` / `:q!`
-    - Direct VGA writes, no terminal emulations lol
+  <div style="flex: 1 1 280px; border: 2px solid #7c3aed; border-radius: 16px; padding: 1.2em; background: #f3e8ff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    <h3 style="margin-top:0; color:#6d28d9;">UI & shell</h3>
+    <ul style="margin:0; padding-left:1.2em;">
+      <li><strong>Status bar</strong>: shows uptime + timed message on protected rows</li>
+      <li><strong>Scrollback buffer</strong>: HEY, <code>Ctrl+UP/Dwn</code> or <code>pg up/down</code></li>
+      <li><strong>Interactive shells</strong>: prompt <code>user@gymbro:/cwd&gt;</code> and 25 builtin commands</li>
+    </ul>
+  </div>
+
+  <div style="flex: 1 1 280px; border: 2px solid #db2777; border-radius: 16px; padding: 1.2em; background: #fce7f3; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    <h3 style="margin-top:0; color:#be185d;">Vi-like Editor</h3>
+    <ul style="margin:0; padding-left:1.2em;">
+      <li>Modal editor: Normal, Insert, Command, Search</li>
+      <li><code>hjkl</code>, word motions, <code>0</code>/<code>$</code>, <code>gg</code>/<code>G</code></li>
+      <li>Undo, search (<code>/term</code> + <code>n</code>), <code>:w</code> / <code>:q</code>/ <code>:wq</code> / <code>:q!</code></li>
+      <li>Direct VGA writes, no terminal emulations lol</li>
+    </ul>
+  </div>
+
+</div>
 
 ## Build & Run
 
