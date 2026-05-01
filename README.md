@@ -49,6 +49,7 @@ So, I wanted to set an example by reminding people deep inside tech, how importa
 ## Buffs
 
 ### Core & boot
+```
     - **Custom boot sector**: real mode, loads the kernel via `INT 0x13`
     - **A20 gate** with 3 fallback methods
     - **Protected mode switch**: flat 4 GB GDT, `CR0.PE` bit
