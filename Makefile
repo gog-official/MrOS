@@ -66,6 +66,15 @@ $(FS_IMAGE): $(FS_IMAGE_BPB)
 	dd if=/dev/zero of=$(FS_IMAGE) bs=512 count=$(FS_SECTORS) 2>/dev/null
 	dd if=$(FS_IMAGE_BPB) of=$(FS_IMAGE) bs=512 count=1 conv=notrunc 2>/dev/null
 
+check_kernel_size: $(KERNEL_BIN)
+	@SIZE=$$(wc -c < $(KERNEL_BIN)); \
+	MAX=$$((255 * 512)); \
+	if [ $$SIZE -gt $$MAX ]; then \
+	    echo "ERROR: kernel.bin ($$SIZE bytes) exceeds 255-sector limit ($$MAX bytes)"; \
+	    echo "Increase sector gap between kernel and FS, or move FS_OFFSET"; \
+	    exit 1; \
+	fi
+	@echo "Kernel OK: $$(wc -c < $(KERNEL_BIN)) bytes / $$((255 * 512)) max"
 $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN) $(FS_IMAGE)
 	dd if=/dev/zero of=$(OS_IMAGE) bs=512 count=4096 2>/dev/null
 	dd if=$(BOOT_BIN) of=$(OS_IMAGE) conv=notrunc 2>/dev/null
@@ -81,4 +90,4 @@ run-gui: $(OS_IMAGE)
 clean:
 	rm -f $(BOOT_BIN) $(ENTRY_OBJ) $(C_OBJS) $(KERNEL_BIN) kernel/kernel.elf $(OS_IMAGE) $(FS_IMAGE) $(FS_IMAGE_BPB)
 
-.PHONY: all run run-gui clean
+.PHONY: all run run-gui clean check_kernel_size

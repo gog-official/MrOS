@@ -10,6 +10,61 @@
 #include "../drivers/speaker.h"
 #include "../fs/vfs.h"
 #include "../auth/auth.h"
+#include "../sys/scrollbuf.h"
+#include "vi.h"
+
+// readline that starts with a pre fed first char
+static void readline_with_first(char first, char* out, int max) {
+	int pos = 0;
+
+	// handle the pre-fed char
+	if (first == '\n') {
+		out[0] = '\0';
+		vga_putchar('\n', COLOR_DEFAULT);
+		return;
+	}
+	if (first == '\b') {
+		// nothing to erase yet btw
+	} else if (first >= 0x20 && first <= 0x7E && pos < max - 1) {
+		out[pos++] = first;
+		vga_putchar(first, COLOR_DEFAULT);
+	}
+
+	// now normal readline
+	while (1) {
+		key_event_t e = keyboard_getkey();
+		char c = (char)e.key;
+
+		// scroll keys, handle but dont break out
+		if (e.modifiers & KB_MOD_CTRL) {
+			if (e.key == KEY_UP) { scrollbuf_scroll_up(1); continue; }
+			if (e.key == KEY_DOWN) { scrollbuf_scroll_down(1); continue; }
+			if (e.key == 'd') { scrollbuf_snap(); continue; }
+		}
+		if (e.key == KEY_PAGEUP) { scrollbuf_scroll_up(SCROLLBUF_HALF); continue; }
+		if (e.key == KEY_PAGEDOWN) { scrollbuf_scroll_down(SCROLLBUF_HALF); continue; }
+		if (c == '\n') {
+			out[pos] = '\0';
+			vga_putchar('\n', COLOR_DEFAULT);
+			return;
+		}
+		if (c == '\b') {
+			if (pos > 0) {
+				pos--;
+				if (cursor_col > 0) {
+					cursor_col--;
+					vga_putchar(' ', COLOR_DEFAULT);
+					cursor_col--;
+				}
+			}
+			continue;
+		}
+		if (e.key >= 0x80) continue;
+		if (c < 0x20 || pos >= max - 1) continue;
+		out[pos++] = c;
+		vga_putchar(c, COLOR_DEFAULT);
+	}
+}
 
 //str helpers
 
@@ -307,6 +362,14 @@ void cmd_userdel(int argc, char** argv);
 void cmd_passwd(int argc, char** argv);
 void cmd_logout(int argc, char** argv);
 
+static void cmd_vi(int argc, char** argv) {
+	if (argc < 2) {
+		vga_println("usage: vi <filename>", COLOR_YELLOW);
+		vga_println("  e.g: vi NOTE.TXT", COLOR_GREY);
+		return;
+	}
+	vi_open(argv[1]);
+}
 
 
 // command table
@@ -349,6 +412,8 @@ static const command_t commands[] = {
 	{ "carbs", cmd_carbs, "carbs <kcal/day> <protein(g)> <fat(g)> gives daily carbs req" },
 	{ "water", cmd_water, "how much to drink water" },
 	{ "motivate", cmd_motivation, "get motivation to workout and change your life" }, 
+	// extras
+	{ "vi", cmd_vi, "vi <file> - opens text editor" },
 	//sentinel
 	{ 0, 0, 0 }
 };
@@ -408,12 +473,14 @@ void shell_run(void) {
 		statusbar_update(); // refresh uptime + msg timeout
 		reminder_process(); // play any pending reminder sounds
 
-		vga_print(current_session.username, COLOR_YELLOW);
+		char first_char = 0;
+	vga_print(current_session.username, COLOR_YELLOW);
 		vga_print("@gymbro:", COLOR_DEFAULT);
 		vga_print(vfs_cwd, COLOR_CYAN);
 		vga_print("> ", COLOR_GREEN);
 
-		keyboard_readline(line, SHELL_LINE_MAX);
+		// read teh rest of the line
+		readline_with_first(first_char, line, SHELL_LINE_MAX);
 		cmd_parse(line, argv, &argc);
 		dispatch(argc, argv);
 	}

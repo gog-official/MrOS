@@ -10,7 +10,7 @@
 // scancode table
 static const char sc_normal[88] = {
 	0,
-	0,
+	27,
 	'1','2','3','4','5','6','7','8','9','0','-','=',
 	'\b',
 	'\t',
@@ -59,11 +59,12 @@ static const char sc_shifted[88] = {
 
 // states
 static volatile int shift_held = 0;
-
+static volatile int ctrl_held = 0;
+static volatile int extended = 0;
 static volatile int caps_lock = 0;
 
 // ring buffer
-static volatile char kb_buf[KB_BUFFER_SIZE];
+static volatile key_event_t kb_buf[KB_BUFFER_SIZE];
 static volatile uint32_t kb_head = 0;
 static volatile uint32_t kb_tail = 0;
 
@@ -77,20 +78,23 @@ static inline int buf_empty(void) {
 }
 
 // push one char
-static inline void buf_push(char c) {
+static inline void buf_push(uint8_t key, uint8_t mods) {
 	if (!buf_full()) {
-		kb_buf[kb_head] = c;
+		kb_buf[kb_head].key = key;
+		kb_buf[kb_head].modifiers = mods;
 		kb_head = (kb_head + 1) & KB_BUFFER_MASK;
 	}
 }
 
 // pop one char
 
-static inline char buf_pop(void) {
-	if (buf_empty()) return KB_EMPTY;
-	char c = kb_buf[kb_tail];
-	kb_tail = (kb_tail +1) & KB_BUFFER_MASK;
-	return c;
+static inline key_event_t buf_pop(void) {
+	key_event_t e = { KB_EMPTY, 0 };
+	if (!buf_empty()) {
+		e = kb_buf[kb_tail];
+		kb_tail = (kb_tail + 1) & KB_BUFFER_MASK;
+	}
+	return e;
 }
 
 // irq1 handler
@@ -98,8 +102,46 @@ extern void irq1_wrapper(void);
 
 void keyboard_irq_handler(void) {
 	uint8_t scancode = inb(KEYBOARD_DATA_PORT);
+
+	if (scancode == 0xE0) {
+		extended = 1;
+		pic_send_eoi(1);
+		return;
+	}
+
 	uint8_t is_release = scancode & 0x80;
 	uint8_t make_code = scancode & 0x7F;
+
+	// handle extended scancode
+	if (extended) {
+		extended = 0;
+		if (!is_release) {
+			uint8_t mods = 0;
+			if (shift_held) mods |= KB_MOD_SHIFT;
+			if (ctrl_held) mods |= KB_MOD_CTRL;
+
+			switch (make_code) {
+				case 0x48: buf_push(KEY_UP, mods); break;
+				case 0x50: buf_push(KEY_DOWN, mods); break;
+				case 0x4B: buf_push(KEY_LEFT, mods); break;
+				case 0x4D: buf_push(KEY_RIGHT, mods); break;
+				case 0x49: buf_push(KEY_PAGEUP, mods); break;
+				case 0x51: buf_push(KEY_PAGEDOWN, mods); break;
+				case 0x47: buf_push(KEY_HOME, mods); break;
+				case 0x4F: buf_push(KEY_END, mods); break;
+				case 0x53: buf_push(KEY_DELETE, mods); break;
+				default: break;
+			}
+		}
+		pic_send_eoi(1);
+		return;
+	}
+
+	if (make_code == 0x1D) {
+		ctrl_held = !is_release;
+		pic_send_eoi(1);
+		return;
+	}
 
 	if (make_code == 0x2A || make_code == 0x36) {
 		shift_held = !is_release;
@@ -135,7 +177,10 @@ void keyboard_irq_handler(void) {
 	if(caps_lock && c>= 'A' && c <= 'Z') c = c-'A'+'a';
 
 	if (c != 0) {
-		buf_push(c);
+		uint8_t mods = 0;
+		if (shift_held) mods |= KB_MOD_SHIFT;
+		if (ctrl_held) mods |= KB_MOD_CTRL;
+		buf_push((uint8_t)c, mods);
 	}
 	
 	pic_send_eoi(1);
@@ -156,13 +201,22 @@ void keyboard_init(void) {
 	idt_set_gate(IRQ1_KEYBOARD, (uint32_t)irq1_wrapper, 0x08, IDT_INTERRUPT_GATE);
 }
 
+key_event_t keyboard_getkey(void) {
+	while (buf_empty()) {
+		__asm__ volatile ("hlt");
+	}
+	return buf_pop();
+}
+
 char keyboard_getchar(void) {
 	while (buf_empty()) {
 		statusbar_update();
 		reminder_process(); // play pending reminder sounds while waiting for keyboard input
-		__asm__ volatile ("hlt");
+		key_event_t e = keyboard_getkey();
+		if (e.key != KB_EMPTY && e.key < 0x80) return (char)e.key;
+		if (e.key == KEY_ESCAPE) return 0x1B;
+		if (e.key == KEY_DELETE) return 127;
 	}
-	return buf_pop();
 }
 
 // keyboard readline, reads char until you press return
@@ -172,7 +226,8 @@ void keyboard_readline(char* buf, int max) {
 	while (1) {
 		statusbar_update();
 		reminder_process(); // play any pending reminder sounds while waiting for input
-		char c = keyboard_getchar();
+		key_event_t e = keyboard_getkey();
+		char c = (char)e.key;
 
 		if (c == '\n') {
 			if (pos < max) buf[pos] = '\0';
@@ -194,11 +249,13 @@ void keyboard_readline(char* buf, int max) {
 			continue;
 		}
 
+		if (e.key >= 0x80) continue;
+
 		// ignore tab inside readline
 		if (c == '\t') continue;
 
 		//only printable asscii
-		if (c < 0x20 || c > 0x7E) continue;
+		if (c < 0x20) continue;
 
 		//try not to overflow buf
 		if (pos >= max - 1) continue;

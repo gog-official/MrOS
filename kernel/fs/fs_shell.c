@@ -8,6 +8,7 @@
 void cmd_ls(int argc, char** argv) {
 	const char* path = (argc >= 2) ? argv[1] : vfs_cwd;
 	static vfs_node_t entries[VFS_MAX_DIR_ENTRIED];
+	memset(entries, 0, sizeof(entries));
 	int count = vfs_readdir(path, entries, VFS_MAX_DIR_ENTRIED);
 
 	if (count < 0) {

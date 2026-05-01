@@ -45,7 +45,7 @@ load_kernel:
 	call print_string
 
 	mov ah, 0x02
-	mov al, 100 ; enough for kernel and future plus doom glue
+	mov al, 100 ; enough for kernel and future plus vi
 
 	mov ch, 0
 	mov cl, 2
@@ -205,7 +205,7 @@ init_pm:
 	mov ss, ax
 
 	; new stack
-	mov esp, 0x90000
+	mov esp, 0x200000
 
 	;jmp to kernel
 	jmp 0x08:0x10000 ; CS: offset

@@ -52,8 +52,8 @@ void hash_password(const char* password, uint32_t salt, char* out_hex) {
 	char salted[128];
 	salted[0] = '\0';
 	char salt_str[9];
-	strcat(salted, salt_str);
 	uint32_to_hex(salt, salt_str);
+	strcat(salted, salt_str);
 	strcat(salted, ":");
 	strcat(salted, password);
 

@@ -1,6 +1,7 @@
 // kernel/kernel.c
 
 #include "vga.h"
+#include "../lib/string.h"
 #include "../interrupts/idt.h"
 #include "../interrupts/pic.h"
 #include "../drivers/timer.h"
@@ -13,6 +14,7 @@
 #include "../drivers/ata/ata.h"
 #include "../fs/vfs.h"
 #include "../auth/auth.h"
+#include "../sys/scrollbuf.h"
 
 static volatile unsigned short* const vga_buf = (unsigned short*)VGA_ADDRESS;
 
@@ -38,6 +40,7 @@ void vga_clear(void) {
 	}
 	cursor_row = 0;
 	cursor_col = 0;
+	scrollbuf_init();
 }
 
 static void vga_scroll(void) {
@@ -89,6 +92,10 @@ void vga_clear_row(int row) {
 }
 
 void vga_putchar(char c, uint8_t color) {
+	if (cursor_row >= STATUSBAR_DIVIDER_ROW) {
+		cursor_row = STATUSBAR_DIVIDER_ROW - 1;
+		vga_scroll();
+	}
 	if (c == '\n') {
 		cursor_col = 0;
 		cursor_row++;
@@ -110,6 +117,7 @@ void vga_putchar(char c, uint8_t color) {
 		vga_scroll();
 	}
 	vga_update_cursor(cursor_row, cursor_col);
+	scrollbuf_putchar(c, color);
 }
 
 void vga_print(const char* str, uint8_t color) {
@@ -125,37 +133,6 @@ void vga_println(const char* str, uint8_t color) {
 
 // utility, minimal no stdlib
 
-static char* itoa(int value, char* buf, int base) {
-	static char digits[] = "0123456789ABCDEF";
-	char tmp[32];
-	int i = 0;
-	int negative = 0;
-
-	if (value == 0) {
-		buf[0] = '0';
-		buf[1] = '\0';
-		return buf;
-	}
-
-	if (value < 0 && base == 10) {
-		negative = -1;
-		value = -value;
-	}
-
-	while (value > 0) {
-		tmp[i++] = digits[value % base];
-		value /= base;
-	}
-
-	int j = 0;
-	if (negative) buf[j++] = '-';
-
-	while (i > 0) {
-		buf[j++] = tmp[--i];
-	}
-	buf[j] = '\0';
-	return buf;
-}
 
 void vga_print_int(int value, unsigned char color) {
 	char buf[32];
@@ -207,11 +184,7 @@ void kmain(void) {
 	// draws rows 23-24 while interrupts are off. guarantees bar is visible before first irq fires
 	statusbar_init();
 	if (ata_init() == ATA_OK) {
-		vga_print("[OK] ATA drive         ", COLOR_GREEN);
-		vga_println("disk detected",          COLOR_GREY);
 		if (vfs_init() == 0) {
-			vga_print("[OK] FAT12 filesystem  ", COLOR_GREEN);
-			vga_println("mounted",                COLOR_GREY);
 		} else {
 			vga_print("[--] FAT12 filesystem  ", COLOR_YELLOW);
 			vga_println("mount failed",           COLOR_GREY);
@@ -240,6 +213,7 @@ void kmain(void) {
 
 	
 	vga_clear();
+	scrollbuf_init();
 	statusbar_init();
 
 	vga_println("==============================================", COLOR_CYAN);
@@ -267,7 +241,7 @@ void kmain(void) {
 	
 	vga_clear();
 	statusbar_init();
-	// run_fitness_sequence();
+	run_fitness_sequence();
 	dynamic_sleep(3);
 	vga_clear();
 	statusbar_init();

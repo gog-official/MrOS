@@ -6,7 +6,7 @@
 #include <stddef.h>
 
 // limits
-#define VFS_MAX_NAME 12
+#define VFS_MAX_NAME 13
 #define VFS_MAX_PATH 64
 #define VFS_MAX_OPEN 8
 #define VFS_MAX_DIR_ENTRIED 224
