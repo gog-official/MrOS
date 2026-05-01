@@ -129,5 +129,5 @@ Now go drink some water.
 ---
 
 <div align="center">
-    <sub>Built with glutues 💙</sub>
+    <sub>Built with glutes 💙</sub>
 </div>
