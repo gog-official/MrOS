@@ -33,7 +33,7 @@
 Go to github release page and download the mros.img file and put it inside a seperate directory, then cd into the directory and run the os with `qemu-system-i386 -drive format=raw,file=mros.img -audiodev pa,id=snd -machine pcspk-audiodev=snd`, you will need qemu-system-i386 isntalled on your system btw.
 
 ## Video
-Since github wasnt previewing the cdn I uploaded from hackclub, instead watch from this url: ![VIDEO URL - CLICK THIS](https://cdn.hackclub.com/019de468-4788-7ca3-8986-6a4c7b494650/screenrecording-2026-05-01_22-08-23%20(online-video-cutter.com).mp4)
+Since github wasnt previewing the cdn I uploaded from hackclub, instead watch from this url: ![VIDEO URL - CLICK THIS]([https://cdn.hackclub.com/019de468-4788-7ca3-8986-6a4c7b494650/screenrecording-2026-05-01_22-08-23%20(online-video-cutter.com).mp4](https://user-cdn.hackclub-assets.com/019de468-4788-7ca3-8986-6a4c7b494650/screenrecording-2026-05-01_22-08-23%20(online-video-cutter.com).mp4))
 
 ## Basic overview
 
