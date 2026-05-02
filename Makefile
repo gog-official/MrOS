@@ -81,19 +81,6 @@ $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN) $(FS_IMAGE)
 	dd if=$(KERNEL_BIN) of=$(OS_IMAGE) bs=512 seek=1 conv=notrunc 2>/dev/null
 	dd if=$(FS_IMAGE) of=$(OS_IMAGE) bs=512 seek=$(FS_OFFSET) conv=notrunc 2>/dev/null
 
-iso: mros.img
-	# Create a proper bootable ISO using grub-mkrescue style approach
-	mkdir -p iso_staging/boot/grub
-	cp mros.img iso_staging/boot/
-	echo 'set timeout=0' > iso_staging/boot/grub/grub.cfg
-	echo 'set default=0' >> iso_staging/boot/grub/grub.cfg
-	echo 'menuentry "MrOS" {' >> iso_staging/boot/grub/grub.cfg
-	echo '  multiboot2 /boot/mros.img' >> iso_staging/boot/grub/grub.cfg
-	echo '  boot' >> iso_staging/boot/grub/grub.cfg
-	echo '}' >> iso_staging/boot/grub/grub.cfg
-	grub-mkrescue -o mros.iso iso_staging 2>/dev/null || \
-	xorriso -as mkisofs -o mros.iso -b mros.img -c boot.cat -boot-info-table -no-emul-boot -boot-load-size 4 -V "MROS" iso_staging
-	rm -rf iso_staging
 
 run: $(OS_IMAGE)
 	$(QEMU) -drive format=raw,file=$(OS_IMAGE) -nographic
@@ -101,8 +88,6 @@ run: $(OS_IMAGE)
 run-gui: $(OS_IMAGE)
 	$(QEMU) -drive format=raw,file=$(OS_IMAGE) -audiodev pa,id=snd -machine pcspk-audiodev=snd
 
-run-iso: mros.iso
-	$(QEMU) -cdrom mros.iso -boot d -nographic
 clean:
 	rm -f $(BOOT_BIN) $(ENTRY_OBJ) $(C_OBJS) $(KERNEL_BIN) kernel/kernel.elf $(OS_IMAGE) $(FS_IMAGE) $(FS_IMAGE_BPB)
 
